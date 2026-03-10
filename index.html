@@ -798,14 +798,16 @@ select option{background:var(--S);}
         <div class="auth-h">¿Olvidaste tu contraseña?</div>
         <div class="auth-sub">Ingresá tu email y te enviamos un enlace para restablecer tu contraseña.</div>
         <div id="forgotError" class="auth-error"></div>
-        <div id="forgotSuccess" style="display:none;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:12px 14px;font-size:.84rem;color:#10B981;margin-bottom:14px;line-height:1.6;"></div>
-        <div class="auth-field" style="margin-bottom:20px;">
-          <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:8px;display:block;">Email</label>
-          <input type="email" id="forgot-email" placeholder="tu@email.com" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.95rem;outline:none;box-sizing:border-box;">
+        <div id="forgotSuccess" style="display:none;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:16px;font-size:.88rem;color:#10B981;margin-bottom:14px;line-height:1.7;text-align:center;"></div>
+        <div id="forgotForm">
+          <div class="auth-field" style="margin-bottom:20px;">
+            <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:8px;display:block;">Email</label>
+            <input type="email" id="forgot-email" placeholder="tu@email.com" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.95rem;outline:none;box-sizing:border-box;">
+          </div>
+          <button class="btn-primary" onclick="doForgotPassword()" style="width:100%;padding:14px;border-radius:12px;font-size:.95rem;font-weight:700;margin-bottom:16px;">Enviar link</button>
         </div>
-        <button class="btn-primary" onclick="doForgotPassword()" style="width:100%;padding:14px;border-radius:12px;font-size:.95rem;font-weight:700;margin-bottom:16px;">Enviar link</button>
         <div class="auth-switch" style="text-align:center;">
-          <a onclick="showView('login')" style="font-size:.82rem;">← Volver al inicio de sesión</a>
+          <a onclick="showView('login');document.getElementById('forgotForm').style.display='block';document.getElementById('forgotSuccess').style.display='none';" style="font-size:.82rem;">← Volver al inicio de sesión</a>
         </div>
       </div>
 
@@ -1185,63 +1187,62 @@ select option{background:var(--S);}
 
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
-      <div class="ph"><div><div class="ph-title" data-t="cfg-title">Configuración</div><div class="ph-sub" data-t="cfg-sub">Tarifas y horario nocturno</div></div></div>
+      <div class="ph" style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="ph-title" data-t="cfg-title">Configuración</div>
+          <div class="ph-sub" data-t="cfg-sub">Tarifas y horario nocturno</div>
+        </div>
+        <button onclick="doLogout()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:transparent;color:var(--red);border:1.5px solid var(--red);border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">
+          ↩ Cerrar sesión
+        </button>
+      </div>
       <!-- SALUD: configuración específica -->
       <div id="saludSettingsPanel" style="display:none">
-        <div class="panel">
-          <div class="ptitle">💰 Tarifa por sesión por defecto</div>
-          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">
-            Esta tarifa se usa cuando no especificás un monto en el paciente. Cada paciente puede tener su propia tarifa.
-          </p>
-          <div class="rfield" style="max-width:220px">
-            <span class="r-emoji">💶</span>
-            <div class="r-inner">
-              <div class="r-lbl">Monto por sesión</div>
-              <div class="r-row"><span class="r-cur">€</span><input class="r-inp" type="number" id="cfg-salud-rate" step="0.01" min="0" placeholder="60.00"></div>
+
+        <!-- ROW 1: Tarifa + Días en 2 columnas -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+          <div class="panel" style="margin:0">
+            <div class="ptitle">💰 Tarifa por sesión</div>
+            <p style="font-size:.75rem;color:var(--mu);margin-bottom:12px;line-height:1.5">Monto por defecto. Cada paciente puede tener el suyo.</p>
+            <div class="r-row" style="margin-bottom:14px"><span class="r-cur">€</span><input class="r-inp" type="number" id="cfg-salud-rate" step="0.01" min="0" placeholder="60.00" style="max-width:100px"></div>
+            <button class="btn-cfg" onclick="saveSaludRate()">Guardar</button>
+          </div>
+
+          <div class="panel" style="margin:0">
+            <div class="ptitle">📅 Días de atención</div>
+            <p style="font-size:.75rem;color:var(--mu);margin-bottom:12px;line-height:1.5">Días en que atendés habitualmente.</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px" id="saludDiasWrap">
+              <button class="chip salud-dia" data-dia="1" onclick="toggleSaludDia(this)">Lun</button>
+              <button class="chip salud-dia" data-dia="2" onclick="toggleSaludDia(this)">Mar</button>
+              <button class="chip salud-dia" data-dia="3" onclick="toggleSaludDia(this)">Mié</button>
+              <button class="chip salud-dia" data-dia="4" onclick="toggleSaludDia(this)">Jue</button>
+              <button class="chip salud-dia" data-dia="5" onclick="toggleSaludDia(this)">Vie</button>
+              <button class="chip salud-dia" data-dia="6" onclick="toggleSaludDia(this)">Sáb</button>
+              <button class="chip salud-dia" data-dia="0" onclick="toggleSaludDia(this)">Dom</button>
             </div>
+            <button class="btn-cfg" onclick="saveSaludDias()">Guardar</button>
           </div>
-          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludRate()">Guardar tarifa</button>
         </div>
-        <div class="panel">
-          <div class="ptitle">⏱️ Duración de sesión por defecto</div>
-          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">
-            Usada para calcular el total de horas trabajadas en tu dashboard.
-          </p>
-          <div class="rfield" style="max-width:220px">
-            <span class="r-emoji">🕐</span>
-            <div class="r-inner">
-              <div class="r-lbl">Duración (minutos)</div>
-              <div class="r-row"><input class="r-inp" type="number" id="cfg-salud-dur" step="5" min="15" placeholder="50" style="width:80px"><span style="font-size:.8rem;color:var(--mu);margin-left:6px">min</span></div>
-            </div>
+
+        <!-- ROW 2: Meta mensual + Nota de cobro -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+
+          <div class="panel" style="margin:0">
+            <div class="ptitle">🎯 Meta mensual</div>
+            <p style="font-size:.75rem;color:var(--mu);margin-bottom:12px;line-height:1.5">¿Cuántas sesiones querés tener este mes?</p>
+            <div class="r-row" style="margin-bottom:14px"><input class="r-inp" type="number" id="cfg-salud-meta" step="1" min="1" placeholder="20" style="max-width:80px"><span style="font-size:.8rem;color:var(--mu);margin-left:6px">sesiones</span></div>
+            <button class="btn-cfg" onclick="saveSaludMeta()">Guardar</button>
           </div>
-          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludDuration()">Guardar duración</button>
-        </div>
-        <div class="panel">
-          <div class="ptitle">📅 Días de atención</div>
-          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">Seleccioná los días en que atendés habitualmente.</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" id="saludDiasWrap">
-            <button class="chip salud-dia" data-dia="1" onclick="toggleSaludDia(this)">Lun</button>
-            <button class="chip salud-dia" data-dia="2" onclick="toggleSaludDia(this)">Mar</button>
-            <button class="chip salud-dia" data-dia="3" onclick="toggleSaludDia(this)">Mié</button>
-            <button class="chip salud-dia" data-dia="4" onclick="toggleSaludDia(this)">Jue</button>
-            <button class="chip salud-dia" data-dia="5" onclick="toggleSaludDia(this)">Vie</button>
-            <button class="chip salud-dia" data-dia="6" onclick="toggleSaludDia(this)">Sáb</button>
-            <button class="chip salud-dia" data-dia="0" onclick="toggleSaludDia(this)">Dom</button>
+
+          <div class="panel" style="margin:0">
+            <div class="ptitle">📝 Nota de cobro</div>
+            <p style="font-size:.75rem;color:var(--mu);margin-bottom:12px;line-height:1.5">Texto que aparece al exportar tu resumen de sesiones.</p>
+            <textarea id="cfg-salud-nota" rows="3" style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.8rem;resize:none;box-sizing:border-box;margin-bottom:14px;" placeholder="Ej: Pago por transferencia a CBU..."></textarea>
+            <button class="btn-cfg" onclick="saveSaludNota()">Guardar</button>
           </div>
-          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludDias()">Guardar días</button>
         </div>
-        <div class="panel">
-          <div class="ptitle">🎯 Meta mensual de sesiones</div>
-          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">¿Cuántas sesiones querés tener por mes?</p>
-          <div class="rfield" style="max-width:220px">
-            <span class="r-emoji">🎯</span>
-            <div class="r-inner">
-              <div class="r-lbl">Sesiones por mes</div>
-              <div class="r-row"><input class="r-inp" type="number" id="cfg-salud-meta" step="1" min="1" placeholder="20"></div>
-            </div>
-          </div>
-          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludMeta()">Guardar meta</button>
-        </div>
+
       </div>
 
       <div id="ratesPanelWrap">
@@ -1649,10 +1650,16 @@ function saveSaludMeta(){
   const v=parseInt(document.getElementById('cfg-salud-meta').value)||20;
   S.saludMetaSesiones=v; saveData(); toast('Meta guardada ✓','#10B981');
 }
+function saveSaludNota(){
+  const v=document.getElementById('cfg-salud-nota').value.trim();
+  S.saludNota=v; saveData(); toast('Nota guardada ✓','#10B981');
+}
 function _loadSaludSettings(){
   if(S.saludRate) document.getElementById('cfg-salud-rate').value=S.saludRate;
   if(S.saludDuration) document.getElementById('cfg-salud-dur').value=S.saludDuration;
   if(S.saludMetaSesiones) document.getElementById('cfg-salud-meta').value=S.saludMetaSesiones;
+  const notaEl=document.getElementById('cfg-salud-nota');
+  if(notaEl && S.saludNota) notaEl.value=S.saludNota;
   if(S.saludDias){
     document.querySelectorAll('.salud-dia').forEach(b=>{
       b.classList.toggle('active', S.saludDias.includes(parseInt(b.dataset.dia)));
@@ -2123,6 +2130,7 @@ async function doForgotPassword(){
   } else {
     okEl.innerHTML='✅ Te enviamos un enlace a <strong>'+email+'</strong>.<br>Revisá también la carpeta de spam.';
     okEl.style.display='block';
+    document.getElementById('forgotForm').style.display='none';
     document.getElementById('forgot-email').value='';
   }
 }
