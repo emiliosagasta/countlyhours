@@ -786,8 +786,43 @@ select option{background:var(--S);}
         <div class="auth-field"><label>Correo electrónico</label><input type="email" id="li-email" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <div class="auth-field"><label>Contraseña</label><input type="password" id="li-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <button class="btn-primary" onclick="doLogin()">Iniciar sesión</button>
-        <div class="auth-switch">¿No tienes cuenta? <a onclick="showView('register')">Registrarse</a></div>
+        <div class="auth-switch" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>¿No tienes cuenta? <a onclick="showView('register')">Registrarse</a></span>
+          <a onclick="showView('forgot')" style="font-size:.78rem;color:var(--mu);">¿Olvidaste tu contraseña?</a>
+        </div>
         <button class="auth-demo-btn" onclick="loginDemo('hosteleria')" style="font-size:.8rem;border-radius:8px 0 0 8px;border-right:none">🏨 Demo Hostelería</button><button class="auth-demo-btn" onclick="loginDemo('salud')" style="font-size:.8rem;border-radius:0 8px 8px 0">🩺 Demo Salud</button>
+      </div>
+
+      <!-- FORGOT PASSWORD VIEW -->
+      <div id="viewForgot" style="display:none">
+        <div class="auth-h">¿Olvidaste tu contraseña?</div>
+        <div class="auth-sub">Ingresá tu email y te enviamos un enlace para restablecer tu contraseña.</div>
+        <div id="forgotError" class="auth-error"></div>
+        <div id="forgotSuccess" style="display:none;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:12px 14px;font-size:.84rem;color:#10B981;margin-bottom:14px;line-height:1.6;"></div>
+        <div class="auth-field" style="margin-bottom:20px;">
+          <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:8px;display:block;">Email</label>
+          <input type="email" id="forgot-email" placeholder="tu@email.com" style="width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.95rem;outline:none;box-sizing:border-box;">
+        </div>
+        <button class="btn-primary" onclick="doForgotPassword()" style="width:100%;padding:14px;border-radius:12px;font-size:.95rem;font-weight:700;margin-bottom:16px;">Enviar link</button>
+        <div class="auth-switch" style="text-align:center;">
+          <a onclick="showView('login')" style="font-size:.82rem;">← Volver al inicio de sesión</a>
+        </div>
+      </div>
+
+      <!-- RESET PASSWORD VIEW (cuando llegan desde el email) -->
+      <div id="viewReset" style="display:none">
+        <div class="auth-h">Nueva contraseña</div>
+        <div class="auth-sub">Elegí una contraseña segura</div>
+        <div id="resetError" class="auth-error"></div>
+        <div class="auth-field">
+          <label>Nueva contraseña (mín. 8 caracteres)</label>
+          <input type="password" id="reset-pw" placeholder="••••••••" minlength="8">
+        </div>
+        <div class="auth-field">
+          <label>Repetir contraseña</label>
+          <input type="password" id="reset-pw2" placeholder="••••••••" minlength="8">
+        </div>
+        <button class="btn-primary" onclick="doResetPassword()">Guardar nueva contraseña →</button>
       </div>
 
       <!-- REGISTER VIEW -->
@@ -1151,6 +1186,64 @@ select option{background:var(--S);}
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
       <div class="ph"><div><div class="ph-title" data-t="cfg-title">Configuración</div><div class="ph-sub" data-t="cfg-sub">Tarifas y horario nocturno</div></div></div>
+      <!-- SALUD: configuración específica -->
+      <div id="saludSettingsPanel" style="display:none">
+        <div class="panel">
+          <div class="ptitle">💰 Tarifa por sesión por defecto</div>
+          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">
+            Esta tarifa se usa cuando no especificás un monto en el paciente. Cada paciente puede tener su propia tarifa.
+          </p>
+          <div class="rfield" style="max-width:220px">
+            <span class="r-emoji">💶</span>
+            <div class="r-inner">
+              <div class="r-lbl">Monto por sesión</div>
+              <div class="r-row"><span class="r-cur">€</span><input class="r-inp" type="number" id="cfg-salud-rate" step="0.01" min="0" placeholder="60.00"></div>
+            </div>
+          </div>
+          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludRate()">Guardar tarifa</button>
+        </div>
+        <div class="panel">
+          <div class="ptitle">⏱️ Duración de sesión por defecto</div>
+          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">
+            Usada para calcular el total de horas trabajadas en tu dashboard.
+          </p>
+          <div class="rfield" style="max-width:220px">
+            <span class="r-emoji">🕐</span>
+            <div class="r-inner">
+              <div class="r-lbl">Duración (minutos)</div>
+              <div class="r-row"><input class="r-inp" type="number" id="cfg-salud-dur" step="5" min="15" placeholder="50" style="width:80px"><span style="font-size:.8rem;color:var(--mu);margin-left:6px">min</span></div>
+            </div>
+          </div>
+          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludDuration()">Guardar duración</button>
+        </div>
+        <div class="panel">
+          <div class="ptitle">📅 Días de atención</div>
+          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">Seleccioná los días en que atendés habitualmente.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="saludDiasWrap">
+            <button class="chip salud-dia" data-dia="1" onclick="toggleSaludDia(this)">Lun</button>
+            <button class="chip salud-dia" data-dia="2" onclick="toggleSaludDia(this)">Mar</button>
+            <button class="chip salud-dia" data-dia="3" onclick="toggleSaludDia(this)">Mié</button>
+            <button class="chip salud-dia" data-dia="4" onclick="toggleSaludDia(this)">Jue</button>
+            <button class="chip salud-dia" data-dia="5" onclick="toggleSaludDia(this)">Vie</button>
+            <button class="chip salud-dia" data-dia="6" onclick="toggleSaludDia(this)">Sáb</button>
+            <button class="chip salud-dia" data-dia="0" onclick="toggleSaludDia(this)">Dom</button>
+          </div>
+          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludDias()">Guardar días</button>
+        </div>
+        <div class="panel">
+          <div class="ptitle">🎯 Meta mensual de sesiones</div>
+          <p style="font-size:.78rem;color:var(--mu);margin-bottom:14px;line-height:1.6">¿Cuántas sesiones querés tener por mes?</p>
+          <div class="rfield" style="max-width:220px">
+            <span class="r-emoji">🎯</span>
+            <div class="r-inner">
+              <div class="r-lbl">Sesiones por mes</div>
+              <div class="r-row"><input class="r-inp" type="number" id="cfg-salud-meta" step="1" min="1" placeholder="20"></div>
+            </div>
+          </div>
+          <button class="btn-cfg" style="margin-top:14px" onclick="saveSaludMeta()">Guardar meta</button>
+        </div>
+      </div>
+
       <div id="ratesPanelWrap">
       <div class="panel">
         <div class="ptitle" data-t="rates-title">💰 Tarifas horarias por defecto</div>
@@ -1192,6 +1285,17 @@ select option{background:var(--S);}
         <div class="ptitle" data-t="rate-hist">📜 Historial de cambios de tarifas</div>
         <div id="rateHistoryList"></div>
       </div>
+    </div>
+
+    <!-- Cerrar sesión en settings -->
+    <div class="panel" style="border:1.5px solid rgba(239,68,68,.2);margin-top:8px;">
+      <div class="ptitle" style="color:var(--red);">⚠️ Cuenta</div>
+      <p style="font-size:.82rem;color:var(--mu);margin-bottom:16px;line-height:1.6;">
+        Al cerrar sesión se eliminarán los datos locales. Tu historial guardado en la nube permanece intacto.
+      </p>
+      <button class="btn-lo" onclick="doLogout()" style="width:100%;justify-content:center;">
+        ↩ Cerrar sesión
+      </button>
     </div>
 
     <!-- PROFILE -->
@@ -1321,55 +1425,95 @@ select option{background:var(--S);}
 
 <!-- ETT MODAL -->
 <div class="modal-ov" id="ettModalOv">
-  <div class="modal" style="max-width:500px">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto;">
     <h3 id="ettModalTitle">Nueva ETT</h3>
     <p id="ettModalDesc" style="font-size:.83rem;color:var(--mu);margin-bottom:18px">Configurá la agencia y sus tarifas</p>
     <input type="hidden" id="em-id">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-      <div class="field" style="grid-column:span 2">
-        <label id="ettNameLabel">Nombre de la ETT *</label>
-        <input type="text" id="em-name" placeholder="Ej: Temporing, Adecco…" oninput="this.value=this.value.charAt(0).toUpperCase()+this.value.slice(1)">
-      </div>
-      <div class="field"><label>☀ Tarifa diurna (€/h) *</label><input type="number" id="em-day" step="0.01" min="0" placeholder="10.80"></div>
-      <div class="field"><label>🌙 Tarifa nocturna (€/h) *</label><input type="number" id="em-night" step="0.01" min="0" placeholder="13.00"></div>
 
-      <div class="field" style="grid-column:span 2">
-        <div class="ett-night-header">
-          <label>🌙 Horario nocturno de esta ETT</label>
-          <span class="ett-night-note" id="em-night-note">Usando horario global (22:00 – 06:00)</span>
+    <!-- ── HOSTELERÍA FIELDS ── -->
+    <div id="em-hosteleria-fields">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="field" style="grid-column:span 2">
+          <label id="ettNameLabel">Nombre de la ETT *</label>
+          <input type="text" id="em-name" placeholder="Ej: Temporing, Adecco…" oninput="this.value=this.value.charAt(0).toUpperCase()+this.value.slice(1)">
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
-          <div>
-            <div style="font-size:.62rem;color:var(--mu);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Inicio nocturno</div>
-            <div class="time-field-wrap">
-              <input type="text" id="em-ns" placeholder="22" maxlength="5"
-                oninput="smartTime('em-ns','em-ns-ap');updateEttNightNote()">
-              <span class="ampm-sub" id="em-ns-ap"></span>
+        <div class="field"><label>☀ Tarifa diurna (€/h) *</label><input type="number" id="em-day" step="0.01" min="0" placeholder="10.80"></div>
+        <div class="field"><label>🌙 Tarifa nocturna (€/h) *</label><input type="number" id="em-night" step="0.01" min="0" placeholder="13.00"></div>
+        <div class="field" style="grid-column:span 2">
+          <div class="ett-night-header">
+            <label>🌙 Horario nocturno de esta ETT</label>
+            <span class="ett-night-note" id="em-night-note">Usando horario global (22:00 – 06:00)</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+            <div>
+              <div style="font-size:.62rem;color:var(--mu);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Inicio nocturno</div>
+              <div class="time-field-wrap">
+                <input type="text" id="em-ns" placeholder="22" maxlength="5" oninput="smartTime('em-ns','em-ns-ap');updateEttNightNote()">
+                <span class="ampm-sub" id="em-ns-ap"></span>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.62rem;color:var(--mu);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Fin nocturno</div>
+              <div class="time-field-wrap">
+                <input type="text" id="em-ne" placeholder="6" maxlength="5" oninput="smartTime('em-ne','em-ne-ap');updateEttNightNote()">
+                <span class="ampm-sub" id="em-ne-ap"></span>
+              </div>
             </div>
           </div>
-          <div>
-            <div style="font-size:.62rem;color:var(--mu);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Fin nocturno</div>
-            <div class="time-field-wrap">
-              <input type="text" id="em-ne" placeholder="6" maxlength="5"
-                oninput="smartTime('em-ne','em-ne-ap');updateEttNightNote()">
-              <span class="ampm-sub" id="em-ne-ap"></span>
-            </div>
-          </div>
         </div>
-        <div class="ett-night-hint" id="em-night-hint"></div>
-      </div>
-
-      <div class="field"><label>📞 Teléfono / Contacto</label><input type="text" id="em-phone" placeholder="+34 600 000 000"></div>
-      <div class="field"><label>🎨 Color identificador</label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="color" id="em-color" value="#2563EB" style="width:42px;height:38px;border:none;border-radius:8px;cursor:pointer;padding:2px;background:none">
-          <div class="ett-color-presets" id="emColorPresets"></div>
+        <div class="field" style="grid-column:span 2">
+          <label>📞 Teléfono (opcional)</label>
+          <input type="tel" id="em-phone" placeholder="+34 600 000 000">
         </div>
       </div>
     </div>
+
+    <!-- ── SALUD / PACIENTE FIELDS ── -->
+    <div id="em-salud-fields" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="field" style="grid-column:span 2">
+          <label>👤 Nombre y apellido *</label>
+          <input type="text" id="em-pac-nombre" placeholder="Ej: María García" oninput="this.value=this.value.charAt(0).toUpperCase()+this.value.slice(1)">
+        </div>
+        <div class="field">
+          <label>🆔 ID / Nº de sesiones</label>
+          <input type="text" id="em-pac-id" placeholder="Ej: PAC-001">
+        </div>
+        <div class="field">
+          <label>💰 Monto por sesión (€) *</label>
+          <input type="number" id="em-pac-monto" step="0.01" min="0" placeholder="60.00">
+        </div>
+        <div class="field">
+          <label>📧 Email</label>
+          <input type="email" id="em-pac-email" placeholder="paciente@email.com">
+        </div>
+        <div class="field">
+          <label>💬 WhatsApp</label>
+          <input type="tel" id="em-pac-wa" placeholder="+34 600 000 000">
+        </div>
+        <div class="field">
+          <label>🌍 Nacionalidad</label>
+          <input type="text" id="em-pac-nac" placeholder="Ej: Argentina">
+        </div>
+        <div class="field">
+          <label>📍 País de residencia</label>
+          <input type="text" id="em-pac-pais" placeholder="Ej: España">
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COLOR (ambos) ── -->
+    <div class="field" style="margin-bottom:14px">
+      <label>🎨 Color</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+        <input type="color" id="em-color" style="width:38px;height:38px;border:none;border-radius:8px;cursor:pointer;padding:0">
+        <div class="ett-color-presets" id="emColorPresets"></div>
+      </div>
+    </div>
+
     <div class="modal-btns">
       <button class="btn-cn" onclick="closeEttModal()">Cancelar</button>
-      <button class="btn-sv" onclick="saveEtt()">Guardar ETT</button>
+      <button class="btn-sv" id="ettSaveBtn" onclick="saveEtt()">Guardar ETT</button>
     </div>
   </div>
 </div>
@@ -1486,6 +1630,36 @@ function confirmProfession(){
   applyProfessionText();
 }
 
+function saveSaludRate(){
+  const v=parseFloat(document.getElementById('cfg-salud-rate').value)||0;
+  S.saludRate=v; saveData(); toast('Tarifa guardada ✓','#10B981');
+}
+function saveSaludDuration(){
+  const v=parseInt(document.getElementById('cfg-salud-dur').value)||50;
+  S.saludDuration=v; saveData(); toast('Duración guardada ✓','#10B981');
+}
+function toggleSaludDia(btn){
+  btn.classList.toggle('active');
+}
+function saveSaludDias(){
+  const dias=[...document.querySelectorAll('.salud-dia.active')].map(b=>parseInt(b.dataset.dia));
+  S.saludDias=dias; saveData(); toast('Días guardados ✓','#10B981');
+}
+function saveSaludMeta(){
+  const v=parseInt(document.getElementById('cfg-salud-meta').value)||20;
+  S.saludMetaSesiones=v; saveData(); toast('Meta guardada ✓','#10B981');
+}
+function _loadSaludSettings(){
+  if(S.saludRate) document.getElementById('cfg-salud-rate').value=S.saludRate;
+  if(S.saludDuration) document.getElementById('cfg-salud-dur').value=S.saludDuration;
+  if(S.saludMetaSesiones) document.getElementById('cfg-salud-meta').value=S.saludMetaSesiones;
+  if(S.saludDias){
+    document.querySelectorAll('.salud-dia').forEach(b=>{
+      b.classList.toggle('active', S.saludDias.includes(parseInt(b.dataset.dia)));
+    });
+  }
+}
+
 function changeProfession(p){
   S.profession=p;
   applyProfessionText();
@@ -1548,6 +1722,11 @@ function applyProfessionText(){
   // Rates panel - hide for salud
   const ratesWrap=document.getElementById('ratesPanelWrap');
   if(ratesWrap) ratesWrap.style.display=isSalud?'none':'block';
+  const saludPanel=document.getElementById('saludSettingsPanel');
+  if(saludPanel){
+    saludPanel.style.display=isSalud?'block':'none';
+    if(isSalud) _loadSaludSettings();
+  }
   // Onboarding sub text
   const obSub=document.getElementById('ob-sub-text');
   if(obSub){
@@ -1644,7 +1823,7 @@ const S = {
   calMonth: new Date().getMonth(),
   calSel: null, isDemo: false,
   monthGoal: 0,
-  plan: 'free'
+  plan: 'free', saludRate:60, saludDuration:50, saludDias:[1,2,3,4,5], saludMetaSesiones:20
 };;
 
 const ETT_COLORS = ['#2563EB','#06B6D4','#F97316','#EF4444','#10B981','#EC4899','#8B5CF6','#F59E0B','#0F172A','#64748B'];
@@ -1936,6 +2115,13 @@ if(_SB)_SB.auth.onAuthStateChange(async(event,session)=>{
 });
 
 async function checkLogin(){
+  // Handle password reset redirect from email
+  if(window.location.hash.includes('reset-password') || window.location.hash.includes('type=recovery')){
+    _hideAllScreens();
+    document.getElementById('authScreen').style.display='flex';
+    showView('reset');
+    return;
+  }
   if(!_SB){
     var sub=document.getElementById('loginSubtitle');
     if(sub)sub.textContent='Ingresá a tu cuenta';
