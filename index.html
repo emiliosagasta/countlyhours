@@ -788,7 +788,7 @@ select option{background:var(--S);}
         <div class="auth-field"><label>Contraseña</label><input type="password" id="li-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <button class="btn-primary" onclick="doLogin()">Iniciar sesión</button>
         <div class="auth-switch" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>¿No tienes cuenta? <a onclick="showView('profession')">Registrarse</a></span>
+          <span>¿No tienes cuenta? <a onclick="document.getElementById('authScreen').style.display='none';document.getElementById('professionScreen').style.display='flex';">Registrarse</a></span>
           <a onclick="showView('forgot')" style="font-size:.78rem;color:var(--mu);">¿Olvidaste tu contraseña?</a>
         </div>
         <button class="auth-demo-btn" onclick="loginDemo('hosteleria')" style="font-size:.8rem;border-radius:8px 0 0 8px;border-right:none">🏨 Demo Hostelería</button><button class="auth-demo-btn" onclick="loginDemo('salud')" style="font-size:.8rem;border-radius:0 8px 8px 0">🩺 Demo Salud</button>
