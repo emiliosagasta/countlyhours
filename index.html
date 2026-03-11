@@ -2060,7 +2060,7 @@ function loginDemo(prof){
   S.user={ name: isSalud?'Ana Salud':'Juan Hostelería', email:'demo@countlyhours.app', initials: isSalud?'AS':'JH' };
   S.isDemo = true;
   S.shifts=[]; S.rateHistory=[];
-  S.etts = (S.profession==='salud') ? [{id:'p1',name:'Pacientes OSDE',color:'#10B981',dayRate:60,nightRate:60},{id:'p2',name:'Consulta Privada',color:'#8B5CF6',dayRate:80,nightRate:80}] : [];
+  S.etts = (S.profession==='salud') ? [] : [];
   S.dayRate=10.80; S.nightRate=13.00; S.nightStart=22; S.nightEnd=6;
   S.theme='light'; S.lang='es'; S.colors={a:'#10B981'};
   localStorage.setItem('tp_user', JSON.stringify(S.user));
