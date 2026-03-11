@@ -573,7 +573,7 @@ select option{background:var(--S);}
   <div class="lnd-mockup-wrap">
     <div class="lnd-glow"></div>
     <div class="lnd-phone">
-      <div class="mock-topbar"><div class="mock-month">Marzo 2026</div><div class="mock-badge-green" id="mockBadge">0 turnos</div></div>
+      <div id="mockModeLabel" style="text-align:center;font-size:.63rem;font-weight:700;color:#10B981;padding:4px 0;letter-spacing:.03em;transition:opacity .3s">🍽️ Modo Hostelería</div><div class="mock-topbar"><div class="mock-month">Marzo 2026</div><div class="mock-badge-green" id="mockBadge">0 turnos</div></div>
       <div class="mock-stats">
         <div class="mock-stat"><div class="mock-stat-label">Total confirmado</div><div class="mock-stat-value green" id="mockTotal">€0<span class="mock-cursor"></span></div></div>
         <div class="mock-stat"><div class="mock-stat-label">Horas nocturnas</div><div class="mock-stat-value purple" id="mockNight">0h</div></div>
@@ -1337,10 +1337,27 @@ select option{background:var(--S);}
           <button class="lang-chip active" id="lang-es" onclick="setLang('es')">🇪🇸 Español</button>
           <button class="lang-chip" id="lang-en" onclick="setLang('en')">🇬🇧 English</button>
           <button class="lang-chip" id="lang-ca" onclick="setLang('ca')">🏴 Català</button>
-          <button class="lang-chip" id="lang-fr" onclick="setLang('fr')">🇫🇷 Français</button>
           <button class="lang-chip" id="lang-it" onclick="setLang('it')">🇮🇹 Italiano</button>
           <button class="lang-chip" id="lang-zh" onclick="setLang('zh')">🇨🇳 中文</button>
         </div>
+        <div class="prof-divider"></div>
+
+        <div class="prof-divider"></div>
+
+        <!-- Cambiar contraseña -->
+        <div class="ptitle-sm">🔑 CAMBIAR CONTRASEÑA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+          <div class="field">
+            <label style="font-size:.72rem">Nueva contraseña</label>
+            <input type="password" id="prof-new-pass" placeholder="Mín. 8 caracteres" style="font-size:.85rem">
+          </div>
+          <div class="field">
+            <label style="font-size:.72rem">Confirmar contraseña</label>
+            <input type="password" id="prof-conf-pass" placeholder="Repetí la contraseña" style="font-size:.85rem">
+          </div>
+        </div>
+        <div id="prof-pass-msg" style="font-size:.78rem;margin-top:6px;min-height:18px"></div>
+        <button class="btn-sc" style="margin-top:8px;padding:10px 20px;font-size:.85rem" onclick="doChangePassword()">Cambiar contraseña</button>
         <div class="prof-divider"></div>
 
         <!-- Actions -->
@@ -1772,23 +1789,56 @@ function applyProfessionText(){
   _populateRegProfDropdown();
 }
 
-var _MOCK=[
-  {date:'Lun 3 mar',time:'09:00→17:00',hrs:'8h',night:'0h',amt:86.40,nH:0},
-  {date:'Mié 5 mar',time:'19:00→02:00',hrs:'7h',night:'4h',amt:127.80,nH:4},
-  {date:'Vie 7 mar',time:'22:00→06:00',hrs:'8h',night:'8h',amt:104.00,nH:8},
-  {date:'Sáb 8 mar',time:'18:00→01:00',hrs:'7h',night:'3h',amt:108.60,nH:3},
-  {date:'Mar 11 mar',time:'10:00→18:00',hrs:'8h',night:'0h',amt:86.40,nH:0}
+var _MOCK_HOST=[
+  {date:'Lun 3 mar',time:'09:00→17:00',hrs:'8h',night:'0h',amt:86.40,nH:0,label:'Temporing',color:'#10B981'},
+  {date:'Mié 5 mar',time:'19:00→02:00',hrs:'7h',night:'4h',amt:127.80,nH:4,label:'Adecco',color:'#8B5CF6'},
+  {date:'Vie 7 mar',time:'22:00→06:00',hrs:'8h',night:'8h',amt:104.00,nH:8,label:'Temporing',color:'#10B981'},
+  {date:'Sáb 8 mar',time:'18:00→01:00',hrs:'7h',night:'3h',amt:108.60,nH:3,label:'Adecco',color:'#8B5CF6'},
+  {date:'Mar 11 mar',time:'10:00→18:00',hrs:'8h',night:'0h',amt:86.40,nH:0,label:'Randstad',color:'#F59E0B'}
 ];
+var _MOCK_SALUD=[
+  {date:'Lun 3 mar',time:'10:00→11:00',hrs:'1 ses',night:'',amt:60.00,nH:0,label:'María García',color:'#10B981'},
+  {date:'Mar 4 mar',time:'17:00→18:00',hrs:'1 ses',night:'',amt:80.00,nH:0,label:'Carlos López',color:'#8B5CF6'},
+  {date:'Mié 5 mar',time:'09:00→10:00',hrs:'1 ses',night:'',amt:60.00,nH:0,label:'Ana Martínez',color:'#F59E0B'},
+  {date:'Jue 6 mar',time:'12:00→13:00',hrs:'1 ses',night:'',amt:80.00,nH:0,label:'Carlos López',color:'#8B5CF6'},
+  {date:'Vie 7 mar',time:'16:00→17:00',hrs:'1 ses',night:'',amt:60.00,nH:0,label:'María García',color:'#10B981'}
+];
+var _mockMode='host';
+var _MOCK=_MOCK_HOST;
 function runMockAnimation(){
   var el=document.getElementById('mockShifts');
   var ls=document.getElementById('landingScreen');
   if(!el||!ls||ls.style.display==='none') return;
+  // Alternate between hosteleria and salud
+  _mockMode=_mockMode==='host'?'salud':'host';
+  _MOCK=_mockMode==='host'?_MOCK_HOST:_MOCK_SALUD;
+  var isSalud=_mockMode==='salud';
+  // Update mock header labels
+  var badge=document.getElementById('mockBadge');
+  var topbar=document.querySelector('.mock-topbar .mock-month');
+  if(badge) badge.textContent=isSalud?'5 sesiones':'5 turnos';
+  var nightLbl=document.querySelector('.mock-stat:last-child .mock-stat-label');
+  if(nightLbl) nightLbl.textContent=isSalud?'Sesiones confirmadas':'Horas nocturnas';
+  // Rebuild transition label above mock
+  var mockLabel=document.getElementById('mockModeLabel');
+  if(mockLabel){
+    mockLabel.style.opacity='0';
+    setTimeout(function(){
+      mockLabel.textContent=isSalud?'👩‍⚕️ Modo Salud':'🍽️ Modo Hostelería';
+      mockLabel.style.opacity='1';
+    },300);
+  }
   el.innerHTML='';
   _MOCK.forEach(function(s,i){
     var d=document.createElement('div');
     d.className='mock-shift';d.id='_ms'+i;
-    d.innerHTML='<div><div class="mock-shift-date">'+s.date+'</div><div class="mock-shift-time">'+s.time+'</div></div>'
-      +'<div><div class="mock-shift-hrs">'+s.hrs+' 🌙'+s.night+'</div><div class="mock-shift-amt">€'+s.amt.toFixed(2)+'</div></div>';
+    var nightPart=s.night?(' <span style="color:#A78BFA">🌙'+s.night+'</span>'):'';
+    d.innerHTML='<div><div class="mock-shift-date">'+s.date+'</div>'
+      +'<div class="mock-shift-time" style="font-size:.63rem">'+s.time+'</div></div>'
+      +'<div style="text-align:right">'
+      +'<div style="font-size:.62rem;color:'+s.color+';font-weight:700">● '+s.label+'</div>'
+      +'<div class="mock-shift-hrs" style="font-size:.68rem">'+s.hrs+nightPart+'</div>'
+      +'<div class="mock-shift-amt">€'+s.amt.toFixed(2)+'</div></div>';
     el.appendChild(d);
   });
   var i=0,rt=0,rn=0;
@@ -1796,7 +1846,7 @@ function runMockAnimation(){
     if(i>=_MOCK.length){
       setTimeout(function(){
         document.querySelectorAll('.mock-shift').forEach(function(e){e.classList.remove('visible');});
-        setTimeout(function(){rt=0;rn=0;i=0;_updMock(0,0,0);setTimeout(nx,400);},500);
+        setTimeout(function(){rt=0;rn=0;i=0;_updMock(0,0,0);setTimeout(runMockAnimation,600);},500);
       },2800);return;
     }
     var e2=document.getElementById('_ms'+i);if(e2)e2.classList.add('visible');
@@ -2122,7 +2172,16 @@ async function doRegister(){
   localStorage.setItem('tp_profession', S.profession||'hosteleria');
   localStorage.setItem('tp_specialty', S.specialty||'');
   if(btn){btn.textContent='Crear cuenta';btn.disabled=false;}
-  if(r.error){showAuthError('regError',r.error.message);return;}
+  if(r.error){
+    var msg=r.error.message;
+    if(msg.includes('already registered')||msg.includes('already exists')||msg.includes('User already registered')){
+      msg='Este correo ya está registrado. ¿Querés <a onclick="showView(\'login\')" style="color:var(--A);cursor:pointer;text-decoration:underline">iniciar sesión</a>?';
+      document.getElementById('regError').innerHTML='<div style="color:#EF4444;font-size:.82rem;padding:10px 14px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">'+msg+'</div>';
+    } else {
+      showAuthError('regError',msg);
+    }
+    return;
+  }
   var ve=document.getElementById('verifyEmail')||document.getElementById('rg-verify-email');
   if(ve)ve.textContent=email;
   showView('verify');
@@ -2141,6 +2200,20 @@ async function doVerify(){
   toast('✓ ¡Cuenta verificada!','#10B981');
 }
 function resendCode(){ toast('Código reenviado','#6366F1'); }
+async function doChangePassword(){
+  const np=document.getElementById('prof-new-pass').value;
+  const cp=document.getElementById('prof-conf-pass').value;
+  const msg=document.getElementById('prof-pass-msg');
+  if(!np||np.length<8){msg.style.color='#EF4444';msg.textContent='La contraseña debe tener al menos 8 caracteres.';return;}
+  if(np!==cp){msg.style.color='#EF4444';msg.textContent='Las contraseñas no coinciden.';return;}
+  msg.style.color='var(--mu)';msg.textContent='Guardando…';
+  const r=await _SB.auth.updateUser({password:np});
+  if(r.error){msg.style.color='#EF4444';msg.textContent=r.error.message;return;}
+  msg.style.color='#10B981';msg.textContent='✓ Contraseña actualizada correctamente.';
+  document.getElementById('prof-new-pass').value='';
+  document.getElementById('prof-conf-pass').value='';
+  setTimeout(()=>{if(msg)msg.textContent='';},3000);
+}
 async function doLogout(){
   if(_SB) await _SB.auth.signOut();
   localStorage.clear();
