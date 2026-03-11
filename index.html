@@ -1746,6 +1746,8 @@ function applyProfessionText(){
     saludPanel.style.display=isSalud?'block':'none';
     if(isSalud) _loadSaludSettings();
   }
+  const saludLangPanel=document.getElementById('saludLangPanel');
+  if(saludLangPanel) saludLangPanel.style.display=isSalud?'block':'none';
   // Onboarding sub text
   const obSub=document.getElementById('ob-sub-text');
   if(obSub){
@@ -3341,15 +3343,19 @@ function renderEttCards(){
         </div>
       </div>
       <div class="ett-card-rates">
-        <div class="ett-rate-badge day">☀ €${e.dayRate.toFixed(2)}<span>/h</span></div>
-        <div class="ett-rate-badge night">🌙 €${e.nightRate.toFixed(2)}<span>/h</span></div>
+        ${S.profession==='salud'
+          ? `<div class="ett-rate-badge day">💰 €${e.dayRate.toFixed(2)}<span>/ses</span></div>`
+          : `<div class="ett-rate-badge day">☀ €${e.dayRate.toFixed(2)}<span>/h</span></div>
+             <div class="ett-rate-badge night">🌙 €${e.nightRate.toFixed(2)}<span>/h</span></div>`
+        }
       </div>
-      <div class="ett-card-night">
+      ${S.profession!=='salud'?`<div class="ett-card-night">
         🌙 Nocturno: ${String(e.nightStart??S.nightStart).padStart(2,'0')}:00 – ${String(e.nightEnd??S.nightEnd).padStart(2,'0')}:00
         ${(e.nightStart!=null&&(e.nightStart!==S.nightStart||e.nightEnd!==S.nightEnd))?'<span class="ett-custom-badge">personalizado</span>':'<span class="ett-global-badge">global</span>'}
-      </div>
+      </div>`:''}
       ${e.phone?`<div class="ett-card-phone">📞 ${e.phone}</div>`:''}
-      <div class="ett-card-foot">${sc} turno${sc!==1?'s':''} registrado${sc!==1?'s':''}</div>
+      ${S.profession==='salud'&&e.estado?`<div class="ett-card-phone">${e.estado==='activo'?'✅':'⏸'} ${e.estado.charAt(0).toUpperCase()+e.estado.slice(1)}</div>`:''}
+      <div class="ett-card-foot">${sc} sesión${sc!==1?'es':''} registrada${sc!==1?'s':''}</div>
     </div>`;
   }).join('');
 }
@@ -3420,6 +3426,13 @@ function toggleTheme(){applyTheme(S.theme==='dark'?'light':'dark');}
 /* ═══ LANG ═══ */
 function setLang(lang){
   S.lang=lang; applyLang(); saveData();
+  // Sync active state on both profile chips and salud settings chips
+  ['es','en','ca','it','zh','fr'].forEach(l=>{
+    const a=document.getElementById('lang-'+l);
+    const b=document.getElementById('slang-'+l);
+    if(a) a.classList.toggle('active',l===lang);
+    if(b) b.classList.toggle('active',l===lang);
+  });
   toast(lang==='es'?'🇪🇸 Español':lang==='en'?'🇬🇧 English':lang==='ca'?'🏴 Català':lang==='fr'?'🇫🇷 Français':lang==='it'?'🇮🇹 Italiano':'🇨🇳 中文','#10B981');
 }
 function applyLang(){
