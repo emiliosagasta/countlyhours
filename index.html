@@ -3184,25 +3184,52 @@ function renderRateHistory(){
 /* ═══ ETT CRUD ═══ */
 function openEttModal(id){
   const e=id?S.etts.find(x=>x.id===id):null;
-  document.getElementById('ettModalTitle').textContent=e?(S.profession==='salud'?'Editar paciente':'Editar ETT'):(S.profession==='salud'?'Nuevo paciente':'Nueva ETT');
+  const isSalud=(S.profession==='salud');
+
+  // Show/hide correct fields
+  document.getElementById('em-hosteleria-fields').style.display=isSalud?'none':'block';
+  document.getElementById('em-salud-fields').style.display=isSalud?'block':'none';
+
+  // Title + desc
+  document.getElementById('ettModalTitle').textContent=e?(isSalud?'Editar paciente':'Editar ETT'):(isSalud?'Nuevo paciente':'Nueva ETT');
+  document.getElementById('ettModalDesc').textContent=isSalud?'Registrá un paciente con su tarifa de sesión':'Configurá la agencia y sus tarifas';
+  document.getElementById('ettSaveBtn').textContent=isSalud?'Guardar paciente':'Guardar ETT';
   document.getElementById('em-id').value=e?e.id:'';
-  document.getElementById('em-name').value=e?e.name:'';
-  document.getElementById('em-day').value=e?e.dayRate:'';
-  document.getElementById('em-night').value=e?e.nightRate:'';
-  document.getElementById('em-phone').value=e?e.phone:'';
-  // Horario nocturno: usar el propio de la ETT si lo tiene, si no el global
-  const ns = e&&e.nightStart!=null ? e.nightStart : S.nightStart;
-  const ne = e&&e.nightEnd!=null   ? e.nightEnd   : S.nightEnd;
-  document.getElementById('em-ns').value = String(ns).padStart(2,'0')+':00';
-  document.getElementById('em-ne').value = String(ne).padStart(2,'0')+':00';
-  smartTime('em-ns','em-ns-ap');
-  smartTime('em-ne','em-ne-ap');
-  updateEttNightNote();
+
+  if(isSalud){
+    // Salud fields
+    const nombreParts=(e?e.name||'':'').split(' ');
+    document.getElementById('em-pac-nombre').value=nombreParts[0]||'';
+    document.getElementById('em-pac-apellido').value=nombreParts.slice(1).join(' ')||'';
+    document.getElementById('em-pac-monto').value=e?e.dayRate||'':'';
+    document.getElementById('em-pac-wa').value=e?e.phone||'':'';
+    document.getElementById('em-pac-dob').value=e?e.dob||'':'';
+    document.getElementById('em-pac-pago').value=e?e.pago||'':'';
+    document.getElementById('em-pac-email').value=e?e.email||'':'';
+    document.getElementById('em-pac-estado').value=e?e.estado||'activo':'activo';
+  } else {
+    // Hosteleria fields
+    document.getElementById('em-name').value=e?e.name:'';
+    document.getElementById('em-day').value=e?e.dayRate:'';
+    document.getElementById('em-night').value=e?e.nightRate:'';
+    document.getElementById('em-phone').value=e?e.phone||'':'';
+    const ns=e&&e.nightStart!=null?e.nightStart:S.nightStart;
+    const ne=e&&e.nightEnd!=null?e.nightEnd:S.nightEnd;
+    document.getElementById('em-ns').value=String(ns).padStart(2,'0')+':00';
+    document.getElementById('em-ne').value=String(ne).padStart(2,'0')+':00';
+    smartTime('em-ns','em-ns-ap');
+    smartTime('em-ne','em-ne-ap');
+    updateEttNightNote();
+  }
+
   const col=e?e.color:ETT_COLORS[S.etts.length%ETT_COLORS.length];
   document.getElementById('em-color').value=col;
   buildEttColorPresets(col);
   document.getElementById('ettModalOv').classList.add('open');
-  setTimeout(()=>document.getElementById('em-name').focus(),80);
+  setTimeout(()=>{
+    const first=isSalud?document.getElementById('em-pac-nombre'):document.getElementById('em-name');
+    if(first) first.focus();
+  },80);
 }
 function updateEttNightNote(){
   const ns=parseTimeInput(document.getElementById('em-ns').value);
@@ -3229,34 +3256,54 @@ function buildEttColorPresets(current){
       onclick="document.getElementById('em-color').value='${c}';buildEttColorPresets('${c}')"></div>`).join('');
 }
 function saveEtt(){
-  // Normalizar nombre: primera letra mayúscula, resto minúscula
-  const rawName=document.getElementById('em-name').value.trim();
-  const name=rawName.charAt(0).toUpperCase()+rawName.slice(1).toLowerCase();
-  const day=parseFloat(document.getElementById('em-day').value);
-  const night=parseFloat(document.getElementById('em-night').value);
-  const phone=document.getElementById('em-phone').value.trim();
+  const isSalud=(S.profession==='salud');
   const color=document.getElementById('em-color').value;
   const rawId=document.getElementById('em-id').value;
-  // Horario nocturno propio de la ETT
-  const nsRaw=parseTimeInput(document.getElementById('em-ns').value);
-  const neRaw=parseTimeInput(document.getElementById('em-ne').value);
-  const ettNs=nsRaw?parseInt(nsRaw):S.nightStart;
-  const ettNe=neRaw?parseInt(neRaw):S.nightEnd;
-  if(!name){toast('Ingresá el nombre de la ETT 🏢','#EF4444');return;}
-  if(name===name.toUpperCase()&&name.length>1){toast('El nombre no puede ser todo en mayúsculas. Ej: "Temporing", no "TEMPORING" 🚫','#EF4444');return;}
-  if(isNaN(day)||day<=0){toast('Ingresá una tarifa diurna válida ☀','#EF4444');return;}
-  if(isNaN(night)||night<=0){toast('Ingresá una tarifa nocturna válida 🌙','#EF4444');return;}
+  let name, day, night, phone, extraFields={};
+
+  if(isSalud){
+    const pNombre=document.getElementById('em-pac-nombre').value.trim();
+    const pApellido=document.getElementById('em-pac-apellido').value.trim();
+    name=(pNombre+' '+pApellido).trim();
+    day=parseFloat(document.getElementById('em-pac-monto').value)||0;
+    night=day;
+    phone=document.getElementById('em-pac-wa').value.trim();
+    extraFields={
+      email: document.getElementById('em-pac-email').value.trim(),
+      dob:   document.getElementById('em-pac-dob').value,
+      pago:  document.getElementById('em-pac-pago').value,
+      estado:document.getElementById('em-pac-estado').value||'activo',
+    };
+    if(!pNombre){toast('Ingresá el nombre del paciente','#EF4444');return;}
+    if(day<=0){toast('Ingresá un monto por sesión válido 💰','#EF4444');return;}
+  } else {
+    const rawName=document.getElementById('em-name').value.trim();
+    name=rawName.charAt(0).toUpperCase()+rawName.slice(1).toLowerCase();
+    day=parseFloat(document.getElementById('em-day').value);
+    night=parseFloat(document.getElementById('em-night').value);
+    phone=document.getElementById('em-phone').value.trim();
+    const nsRaw=parseTimeInput(document.getElementById('em-ns').value);
+    const neRaw=parseTimeInput(document.getElementById('em-ne').value);
+    extraFields={
+      nightStart:nsRaw?parseInt(nsRaw):S.nightStart,
+      nightEnd:  neRaw?parseInt(neRaw):S.nightEnd,
+    };
+    if(!name){toast('Ingresá el nombre de la ETT 🏢','#EF4444');return;}
+    if(isNaN(day)||day<=0){toast('Ingresá una tarifa diurna válida ☀','#EF4444');return;}
+    if(isNaN(night)||night<=0){toast('Ingresá una tarifa nocturna válida 🌙','#EF4444');return;}
+  }
+
   if(rawId){
-    const e=S.etts.find(x=>x.id===parseInt(rawId));
-    if(e){e.name=name;e.dayRate=day;e.nightRate=night;e.phone=phone;e.color=color;e.nightStart=ettNs;e.nightEnd=ettNe;}
+    const e=S.etts.find(x=>String(x.id)===String(rawId));
+    if(e) Object.assign(e,{name,dayRate:day,nightRate:night,phone,color,...extraFields});
   } else {
     if(S.etts.find(e=>e.name.toLowerCase()===name.toLowerCase())){
-      toast(`Ya existe una ETT llamada "${name}" 👀`,'#F59E0B');return;
+      toast(`Ya existe ${isSalud?'un paciente':'una ETT'} llamado "${name}" 👀`,'#F59E0B');return;
     }
-    S.etts.push({id:Date.now(),name,dayRate:day,nightRate:night,phone,color,nightStart:ettNs,nightEnd:ettNe});
+    S.etts.push({id:String(Date.now()),name,dayRate:day,nightRate:night,phone,color,...extraFields});
   }
   saveData(); closeEttModal(); renderEttCards();
-  toast(`✓ ${name} guardada correctamente 🎉`,'#10B981');
+  toast(`✓ ${name} guardado correctamente 🎉`,'#10B981');
 }
 function deleteEtt(id){
   const e=S.etts.find(x=>x.id===id);
