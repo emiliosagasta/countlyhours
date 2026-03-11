@@ -1059,7 +1059,7 @@ select option{background:var(--S);}
 
       <!-- F8: Filter bar -->
       <div class="filter-bar" id="filterBar">
-        <span style="font-size:.72rem;font-weight:600;color:var(--mu)">Filtrar por ETT:</span>
+        <span style="font-size:.72rem;font-weight:600;color:var(--mu)" id="filterBarLabel">Filtrar por ETT:</span>
         <div id="filterChips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
         <button class="filter-chip active" id="filterAll" onclick="setEttFilter(null)">Todas</button>
       </div>
@@ -1091,9 +1091,9 @@ select option{background:var(--S);}
             <div class="hours-prev" id="hPrev">Ingresá inicio y fin…</div>
           </div>
           <div class="field span2">
-            <label data-t="company">ETT / Empresa</label>
+            <label data-t="company" id="shiftEttLabel">ETT / Empresa</label>
             <div class="ett-ac-wrap">
-              <input type="text" id="f-ett" placeholder="Seleccioná una ETT…" autocomplete="off"
+              <input type="text" id="f-ett" placeholder="Seleccioná una ETT…" id="f-ett-input" autocomplete="off"
                 oninput="onEttInput('f-ett','ettDrop','ettHint')"
                 onfocus="showAllEtts('f-ett','ettDrop','ettHint')"
                 onblur="setTimeout(()=>hideDrop('ettDrop'),220)">
@@ -1118,7 +1118,7 @@ select option{background:var(--S);}
           <span class="shifts-count-badge pend-badge" id="pendCount"></span>
         </div>
         <div class="shifts-hdr">
-          <span>Fecha</span><span>Hora</span><span>ETT</span>
+          <span>Fecha</span><span>Hora</span><span id="ettColHeader1">ETT</span>
           <span>Horas</span><span>Total</span><span></span>
         </div>
         <div class="shifts-wrap" id="shiftsPending"></div>
@@ -1131,7 +1131,7 @@ select option{background:var(--S);}
           <span class="shifts-count-badge conf-badge" id="confCount"></span>
         </div>
         <div class="shifts-hdr">
-          <span>Fecha</span><span>Hora</span><span>ETT</span>
+          <span>Fecha</span><span>Hora</span><span id="ettColHeader2">ETT</span>
           <span>Horas</span><span>Total</span><span></span>
         </div>
         <div class="shifts-wrap" id="shiftsConfirmed"></div>
@@ -1406,7 +1406,7 @@ select option{background:var(--S);}
       <div class="field" style="grid-column:span 2">
         <label>ETT / Empresa</label>
         <div class="ett-ac-wrap">
-          <input type="text" id="es-ett" placeholder="Seleccioná una ETT…" autocomplete="off"
+          <input type="text" id="es-ett" placeholder="Seleccioná una ETT…" id="f-ett-input" autocomplete="off"
             oninput="onEttInput('es-ett','es-ettDrop','es-ettHint')"
             onfocus="showAllEtts('es-ett','es-ettDrop','es-ettHint')"
             onblur="setTimeout(()=>hideDrop('es-ettDrop'),220)">
@@ -1751,6 +1751,14 @@ function applyProfessionText(){
   // Filter chips label
   const fa=document.getElementById('filterAll');
   if(fa) fa.textContent=isSalud?'Todos':'Todas';
+  const fbl=document.getElementById('filterBarLabel');
+  if(fbl) fbl.textContent=isSalud?'Filtrar por Paciente:':'Filtrar por ETT:';
+  ['ettColHeader1','ettColHeader2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=isSalud?'Paciente':'ETT';
+  });
+  const fEttInput=document.getElementById('f-ett-input');
+  if(fEttInput) fEttInput.placeholder=isSalud?'Seleccioná un paciente…':'Seleccioná una ETT…';
   // Populate register dropdown if visible
   _populateRegProfDropdown();
 }
@@ -2351,7 +2359,7 @@ function _buildEttDrop(inputId,dropId,hintId,matches){
   if(!drop) return;
   if(!matches.length){
     drop.innerHTML=`<div style="padding:12px 14px;font-size:.8rem;color:var(--mu);text-align:center">
-      ${S.etts.length===0?`No tenés ETTs cargadas aún — <strong onclick="showPage('etts');openEttModal(null)" style="color:var(--A);cursor:pointer">Agregar una</strong>`:'Sin resultados'}
+      ${S.etts.length===0?`No tenés ${S.profession==='salud'?'pacientes':'ETTs'} cargados aún — <strong onclick="showPage('etts');openEttModal(null)" style="color:var(--A);cursor:pointer">Agregar ${S.profession==='salud'?'uno':'una'}</strong>`:'Sin resultados'}
     </div>`;
     drop.style.display='block';
     if(hint) hint.innerHTML='';
@@ -2359,12 +2367,15 @@ function _buildEttDrop(inputId,dropId,hintId,matches){
   }
   drop.style.display='block';
   drop.innerHTML=matches.map(e=>`
-    <div class="ett-drop-item" onmousedown="selectEttItem('${inputId}','${dropId}','${hintId}',${e.id})">
+    <div class="ett-drop-item" onmousedown="selectEttItem('${inputId}','${dropId}','${hintId}','${e.id}')">
       <span class="ett-dot" style="background:${e.color}"></span>
       <span class="ett-drop-name">${e.name}</span>
       <span class="ett-drop-rates">
-        <span class="pill p-day" style="font-size:.66rem">☀ €${e.dayRate.toFixed(2)}</span>
-        <span class="pill p-night" style="font-size:.66rem">🌙 €${e.nightRate.toFixed(2)}</span>
+        ${S.profession==='salud'
+          ? `<span class="pill p-day" style="font-size:.66rem">💰 €${e.dayRate.toFixed(2)}/ses</span>`
+          : `<span class="pill p-day" style="font-size:.66rem">☀ €${e.dayRate.toFixed(2)}</span>
+             <span class="pill p-night" style="font-size:.66rem">🌙 €${e.nightRate.toFixed(2)}</span>`
+        }
       </span>
     </div>`).join('');
   const exact=S.etts.find(e=>e.name.toLowerCase()===val);
@@ -2390,7 +2401,13 @@ function selectEttItem(inputId,dropId,hintId,ettId){
   document.getElementById(inputId).value=e.name;
   const drop=document.getElementById(dropId); if(drop){drop.innerHTML='';drop.style.display='none';}
   const hint=document.getElementById(hintId);
-  if(hint) hint.innerHTML=`<span style="color:${e.color};font-weight:700">●</span> ${e.name} — ☀ €${e.dayRate.toFixed(2)}/h · 🌙 €${e.nightRate.toFixed(2)}/h`;
+  if(hint){
+    if(S.profession==='salud'){
+      hint.innerHTML=`<span style="color:${e.color};font-weight:700">●</span> ${e.name} — 💰 €${e.dayRate.toFixed(2)}/sesión`;
+    } else {
+      hint.innerHTML=`<span style="color:${e.color};font-weight:700">●</span> ${e.name} — ☀ €${e.dayRate.toFixed(2)}/h · 🌙 €${e.nightRate.toFixed(2)}/h`;
+    }
+  }
   calcPrev();
 }
 function hideDrop(id){const el=document.getElementById(id);if(el){el.innerHTML='';el.style.display='none';}}
@@ -3048,7 +3065,7 @@ function renderHistory(){
   // Table-style history like the screenshots
   const ettMap = {};
   S.etts.forEach(e=>{ ettMap[e.id]=e; });
-  let hdrRow = `<div class="hist-month-hdr-labels"><span>MES</span><span>TURNOS</span><span>TOTAL</span><span>DIURNAS</span><span>NOCTURNAS</span><span>A COBRAR</span><span>ETT</span></div>`;
+  let hdrRow = `<div class="hist-month-hdr-labels"><span>MES</span><span>TURNOS</span><span>TOTAL</span><span>DIURNAS</span><span>NOCTURNAS</span><span>A COBRAR</span>${S.profession==='salud'?'<span>Paciente</span>':`<span>ETT</span>`}</div>`;
   let rows = Object.keys(byMonth).sort((a,b)=>b.localeCompare(a)).map(key=>{
     const ms=byMonth[key];
     const [y,m]=key.split('-').map(Number);
