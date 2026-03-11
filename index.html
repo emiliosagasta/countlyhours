@@ -517,7 +517,7 @@ select option{background:var(--S);}
 @media(max-width:900px){.lnd-hero{grid-template-columns:1fr!important;padding:90px 22px 40px!important;gap:36px}.lnd-mockup-wrap{order:-1}.lnd-features{grid-template-columns:1fr!important;padding:40px 22px!important}.lnd-nav{padding:16px 20px!important}.lnd-footer{padding:20px 22px!important;flex-direction:column;text-align:center}} @media(max-width:900px){#landingScreen [style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;transform:none!important}}
 </style>
 </head>
-<body onclick="(function(e){if(!e.target.closest('#sideQuickPanel')&&!e.target.closest('#sUserBtn')){const p=document.getElementById('sideQuickPanel');if(p&&p.getAttribute('data-open')==='1'){p.setAttribute('data-open','0');p.style.setProperty('display','none','important');}}})(event)">
+<body>
 
 <!-- ═══ ONBOARDING ═══ -->
 <div id="onboarding" style="display:none">
@@ -913,7 +913,7 @@ select option{background:var(--S);}
       <span id="themeLabel">Modo oscuro</span>
     </button>
 
-    <div class="s-user" id="sUserBtn" onclick="toggleSideQuick()">
+    <div class="s-user" id="sUserBtn" onclick="showPage('perfil')">
       <div class="s-av" id="sAv">JD</div>
       <div style="min-width:0;flex:1">
         <div class="s-un" id="sNm">Cargando…</div>
@@ -1364,6 +1364,71 @@ select option{background:var(--S);}
         <!-- Actions -->
         <button class="btn-sc" style="width:100%;padding:13px;font-size:.95rem;margin-bottom:10px" onclick="saveProfile()" id="t-save-btn">Guardar</button>
         <button class="btn-lo" onclick="doLogout()">↩ <span id="t-logout">Cerrar sesión</span></button>
+      </div>
+    </div>
+
+    <!-- ══ PERFIL / CONFIGURACION PERSONAL ══ -->
+    <div class="page" id="page-perfil">
+      <div class="ph" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="ph-title">⚙️ Mi cuenta</div>
+          <div class="ph-sub">Personalizá tu experiencia</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px">
+
+        <!-- COLOR -->
+        <div class="panel">
+          <div class="ptitle">🎨 Color de la app</div>
+          <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px">
+            <input type="color" id="pf-color" value="#10B981"
+              oninput="liveAccent(this.value)"
+              style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
+            <div id="pf-presets" style="display:flex;gap:7px;flex-wrap:wrap;flex:1"></div>
+          </div>
+        </div>
+
+        <!-- IDIOMA -->
+        <div class="panel">
+          <div class="ptitle">🌐 Idioma</div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+            <button onclick="setLang('es')" id="pf-es" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇪🇸 Español</button>
+            <button onclick="setLang('en')" id="pf-en" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇬🇧 English</button>
+            <button onclick="setLang('ca')" id="pf-ca" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🏴 Català</button>
+            <button onclick="setLang('it')" id="pf-it" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇮🇹 Italiano</button>
+            <button onclick="setLang('zh')" id="pf-zh" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇨🇳 中文</button>
+          </div>
+        </div>
+
+        <!-- CAMBIAR CONTRASEÑA -->
+        <div class="panel" style="grid-column:span 2">
+          <div class="ptitle">🔑 Cambiar contraseña</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px">
+            <div class="field">
+              <label style="font-size:.75rem">Contraseña actual</label>
+              <input type="password" id="pf-pass0" placeholder="Tu contraseña actual">
+            </div>
+            <div class="field">
+              <label style="font-size:.75rem">Nueva contraseña</label>
+              <input type="password" id="pf-pass1" placeholder="Mínimo 8 caracteres">
+            </div>
+            <div class="field">
+              <label style="font-size:.75rem">Confirmar nueva</label>
+              <input type="password" id="pf-pass2" placeholder="Repetí la nueva contraseña">
+            </div>
+          </div>
+          <div id="pf-pass-msg" style="font-size:.8rem;min-height:18px;margin:8px 0"></div>
+          <button onclick="doPerfilChangePass()" class="btn-sc" style="padding:10px 24px">Cambiar contraseña</button>
+        </div>
+
+        <!-- CERRAR SESION -->
+        <div class="panel" style="grid-column:span 2;border:1.5px solid rgba(239,68,68,.2)">
+          <div class="ptitle" style="color:var(--red)">⚠️ Sesión</div>
+          <p style="font-size:.83rem;color:var(--mu);margin:8px 0 16px;line-height:1.6">Al cerrar sesión se eliminarán los datos locales. Tu historial en la nube permanece intacto.</p>
+          <button onclick="doLogout()" style="padding:10px 28px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer">↩ Cerrar sesión</button>
+        </div>
+
       </div>
     </div>
 
@@ -2201,6 +2266,45 @@ async function doVerify(){
   toast('✓ ¡Cuenta verificada!','#10B981');
 }
 function resendCode(){ toast('Código reenviado','#6366F1'); }
+function _initPerfilPage(){
+  // Sync color picker
+  const pfc=document.getElementById('pf-color');
+  if(pfc) pfc.value=S.colors.a||'#10B981';
+  // Sync lang chips
+  ['es','en','ca','it','zh'].forEach(l=>{
+    const b=document.getElementById('pf-'+l);
+    if(b) b.classList.toggle('active',S.lang===l);
+  });
+  // Build color presets
+  const presets=document.getElementById('pf-presets');
+  if(presets){
+    const cols=['#10B981','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#F97316','#ead3cc','#4a543c'];
+    presets.innerHTML=cols.map(col=>`
+      <div onclick="liveAccent('${col}');document.getElementById('pf-color').value='${col}'"
+        style="width:26px;height:26px;border-radius:7px;background:${col};cursor:pointer;
+               border:2px solid ${col===S.colors.a?'#fff':'transparent'};flex-shrink:0;transition:border .15s">
+      </div>`).join('');
+  }
+}
+async function doPerfilChangePass(){
+  const op=document.getElementById('pf-pass0').value;
+  const np=document.getElementById('pf-pass1').value;
+  const cp=document.getElementById('pf-pass2').value;
+  const msg=document.getElementById('pf-pass-msg');
+  if(!op){msg.style.color='#EF4444';msg.textContent='Ingresá tu contraseña actual';return;}
+  if(!np||np.length<8){msg.style.color='#EF4444';msg.textContent='Mínimo 8 caracteres';return;}
+  if(np!==cp){msg.style.color='#EF4444';msg.textContent='Las contraseñas no coinciden';return;}
+  msg.style.color='var(--mu)';msg.textContent='Verificando…';
+  const email=S.user&&S.user.email;
+  const reauth=await _SB.auth.signInWithPassword({email,password:op});
+  if(reauth.error){msg.style.color='#EF4444';msg.textContent='Contraseña actual incorrecta';return;}
+  msg.textContent='Actualizando…';
+  const r=await _SB.auth.updateUser({password:np});
+  if(r.error){msg.style.color='#EF4444';msg.textContent=r.error.message;return;}
+  msg.style.color='#10B981';msg.textContent='✓ Contraseña actualizada correctamente';
+  ['pf-pass0','pf-pass1','pf-pass2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  setTimeout(()=>{if(msg)msg.textContent='';},3000);
+}
 function toggleSideQuick(){
   const panel=document.getElementById('sideQuickPanel');
   if(!panel) return;
@@ -2398,6 +2502,7 @@ function startApp(){
 }
 
 function showPage(id){
+  if(id==='perfil') _initPerfilPage();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id)?.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
@@ -3554,12 +3659,10 @@ function setLang(lang){
   S.lang=lang; applyLang(); saveData();
   // Sync active state on both profile chips and salud settings chips
   ['es','en','ca','it','zh','fr'].forEach(l=>{
-    const a=document.getElementById('lang-'+l);
-    const b=document.getElementById('slang-'+l);
-    const sq=document.getElementById('sq-'+l);
-    if(a) a.classList.toggle('active',l===lang);
-    if(b) b.classList.toggle('active',l===lang);
-    if(sq) sq.classList.toggle('active',l===lang);
+    ['lang-','slang-','sq-','pf-'].forEach(pfx=>{
+      const el=document.getElementById(pfx+l);
+      if(el) el.classList.toggle('active',l===lang);
+    });
   });
   toast(lang==='es'?'🇪🇸 Español':lang==='en'?'🇬🇧 English':lang==='ca'?'🏴 Català':lang==='fr'?'🇫🇷 Français':lang==='it'?'🇮🇹 Italiano':'🇨🇳 中文','#10B981');
 }
@@ -3707,35 +3810,5 @@ function openTnc(){
 
 window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 </script>
-<!-- SIDEBAR QUICK PANEL - fixed overlay -->
-<div id="sideQuickPanel" style="display:none;position:fixed;bottom:0;left:0;width:196px;background:var(--S);border-top:1.5px solid var(--bd);border-right:1.5px solid var(--bd);z-index:9999;padding:16px 14px;overflow-y:auto;max-height:calc(100vh - 60px);">
-  <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🎨 COLOR DE LA APP</div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-    <input type="color" id="sq-color" value="#10B981"
-      oninput="liveAccent(this.value)"
-      style="width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
-    <div id="sq-presets" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
-  </div>
-  <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🌐 IDIOMA</div>
-  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
-    <button onclick="setLang('es')" id="sq-es" class="lang-chip" style="font-size:.82rem;padding:8px 10px;width:100%;text-align:left">🇪🇸 Español</button>
-    <button onclick="setLang('en')" id="sq-en" class="lang-chip" style="font-size:.82rem;padding:8px 10px;width:100%;text-align:left">🇬🇧 English</button>
-    <button onclick="setLang('ca')" id="sq-ca" class="lang-chip" style="font-size:.82rem;padding:8px 10px;width:100%;text-align:left">🏴 Català</button>
-    <button onclick="setLang('it')" id="sq-it" class="lang-chip" style="font-size:.82rem;padding:8px 10px;width:100%;text-align:left">🇮🇹 Italiano</button>
-    <button onclick="setLang('zh')" id="sq-zh" class="lang-chip" style="font-size:.82rem;padding:8px 10px;width:100%;text-align:left">🇨🇳 中文</button>
-  </div>
-  <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🔑 CAMBIAR CONTRASEÑA</div>
-  <input type="password" id="sq-pass0" placeholder="Contraseña actual"
-    style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.8rem;margin-bottom:6px;box-sizing:border-box">
-  <input type="password" id="sq-pass1" placeholder="Nueva contraseña (mín. 8)"
-    style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.8rem;margin-bottom:6px;box-sizing:border-box">
-  <input type="password" id="sq-pass2" placeholder="Confirmar nueva contraseña"
-    style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.8rem;margin-bottom:6px;box-sizing:border-box">
-  <div id="sq-pass-msg" style="font-size:.75rem;min-height:16px;margin-bottom:6px"></div>
-  <button onclick="doSidebarChangePass()" style="width:100%;padding:8px;border-radius:8px;background:var(--A);color:#fff;border:none;font-size:.8rem;font-weight:700;cursor:pointer;margin-bottom:10px">Cambiar contraseña</button>
-  <div style="border-top:1px solid var(--bd);padding-top:10px">
-    <button onclick="doLogout()" style="width:100%;padding:8px;border-radius:8px;background:transparent;color:var(--red);border:1.5px solid var(--red);font-size:.8rem;font-weight:700;cursor:pointer">↩ Cerrar sesión</button>
-  </div>
-</div>
 </body>
 </html>
