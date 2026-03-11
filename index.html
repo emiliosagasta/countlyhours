@@ -913,13 +913,14 @@ select option{background:var(--S);}
       <span id="themeLabel">Modo oscuro</span>
     </button>
 
-    <div class="s-user" onclick="showPage('profile')">
+    <div class="s-user" id="sUserBtn" onclick="toggleSideQuick()">
       <div class="s-av" id="sAv">JD</div>
       <div style="min-width:0;flex:1">
         <div class="s-un" id="sNm">Cargando…</div>
         <div class="s-ue" id="sEm">—</div>
       </div>
       <span class="demo-badge" id="demoBadge" style="display:none">DEMO</span>
+      <span id="sideQuickArrow" style="font-size:.75rem;color:var(--mu);flex-shrink:0">⚙</span>
     </div>
 
     <div style="padding:10px 16px;border-top:1px solid var(--bd)">
@@ -2200,6 +2201,50 @@ async function doVerify(){
   toast('✓ ¡Cuenta verificada!','#10B981');
 }
 function resendCode(){ toast('Código reenviado','#6366F1'); }
+function toggleSideQuick(){
+  const panel=document.getElementById('sideQuickPanel');
+  if(!panel) return;
+  const isHidden = panel.getAttribute('data-open')!=='1';
+  if(isHidden){
+    panel.setAttribute('data-open','1');
+    panel.style.setProperty('display','block','important');
+    _initSideQuickPanel();
+  } else {
+    panel.setAttribute('data-open','0');
+    panel.style.setProperty('display','none','important');
+  }
+}
+function _initSideQuickPanel(){
+  // Sync color
+  const sqc=document.getElementById('sq-color');
+  if(sqc) sqc.value=S.colors.a||'#10B981';
+  // Sync lang chips
+  ['es','en','ca','it','zh'].forEach(l=>{
+    const b=document.getElementById('sq-'+l);
+    if(b) b.classList.toggle('active',S.lang===l);
+  });
+  // Build color presets
+  const presets=document.getElementById('sq-presets');
+  if(presets){
+    const cols=['#10B981','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#F97316'];
+    presets.innerHTML=cols.map(col=>`<div onclick="liveAccent('${col}');document.getElementById('sq-color').value='${col}'" 
+      style="width:20px;height:20px;border-radius:5px;background:${col};cursor:pointer;border:2px solid ${col===S.colors.a?'#fff':'transparent'};flex-shrink:0"></div>`).join('');
+  }
+}
+async function doSidebarChangePass(){
+  const np=document.getElementById('sq-pass1').value;
+  const cp=document.getElementById('sq-pass2').value;
+  const msg=document.getElementById('sq-pass-msg');
+  if(!np||np.length<8){msg.style.color='#EF4444';msg.textContent='Mínimo 8 caracteres';return;}
+  if(np!==cp){msg.style.color='#EF4444';msg.textContent='No coinciden';return;}
+  msg.style.color='var(--mu)';msg.textContent='Guardando…';
+  const r=await _SB.auth.updateUser({password:np});
+  if(r.error){msg.style.color='#EF4444';msg.textContent=r.error.message;return;}
+  msg.style.color='#10B981';msg.textContent='✓ Contraseña actualizada';
+  document.getElementById('sq-pass1').value='';
+  document.getElementById('sq-pass2').value='';
+  setTimeout(()=>{if(msg)msg.textContent='';},3000);
+}
 async function doChangePassword(){
   const np=document.getElementById('prof-new-pass').value;
   const cp=document.getElementById('prof-conf-pass').value;
@@ -3503,8 +3548,10 @@ function setLang(lang){
   ['es','en','ca','it','zh','fr'].forEach(l=>{
     const a=document.getElementById('lang-'+l);
     const b=document.getElementById('slang-'+l);
+    const sq=document.getElementById('sq-'+l);
     if(a) a.classList.toggle('active',l===lang);
     if(b) b.classList.toggle('active',l===lang);
+    if(sq) sq.classList.toggle('active',l===lang);
   });
   toast(lang==='es'?'🇪🇸 Español':lang==='en'?'🇬🇧 English':lang==='ca'?'🏴 Català':lang==='fr'?'🇫🇷 Français':lang==='it'?'🇮🇹 Italiano':'🇨🇳 中文','#10B981');
 }
@@ -3652,5 +3699,33 @@ function openTnc(){
 
 window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 </script>
+<!-- SIDEBAR QUICK PANEL - fixed overlay -->
+<div id="sideQuickPanel" style="display:none;position:fixed;bottom:70px;left:206px;width:240px;background:var(--S);border:1.5px solid var(--bd);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:9999;padding:16px;overflow-y:auto;max-height:80vh;">
+  <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🎨 COLOR DE LA APP</div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <input type="color" id="sq-color" value="#10B981"
+      oninput="liveAccent(this.value)"
+      style="width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
+    <div id="sq-presets" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div>
+  </div>
+  <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🌐 IDIOMA</div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">
+    <button onclick="setLang('es')" id="sq-es" class="lang-chip" style="font-size:.72rem;padding:5px 9px">🇪🇸 ES</button>
+    <button onclick="setLang('en')" id="sq-en" class="lang-chip" style="font-size:.72rem;padding:5px 9px">🇬🇧 EN</button>
+    <button onclick="setLang('ca')" id="sq-ca" class="lang-chip" style="font-size:.72rem;padding:5px 9px">🏴 CA</button>
+    <button onclick="setLang('it')" id="sq-it" class="lang-chip" style="font-size:.72rem;padding:5px 9px">🇮🇹 IT</button>
+    <button onclick="setLang('zh')" id="sq-zh" class="lang-chip" style="font-size:.72rem;padding:5px 9px">🇨🇳 ZH</button>
+  </div>
+  <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🔑 CAMBIAR CONTRASEÑA</div>
+  <input type="password" id="sq-pass1" placeholder="Nueva contraseña (mín. 8)"
+    style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.8rem;margin-bottom:6px;box-sizing:border-box">
+  <input type="password" id="sq-pass2" placeholder="Confirmar contraseña"
+    style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.8rem;margin-bottom:6px;box-sizing:border-box">
+  <div id="sq-pass-msg" style="font-size:.75rem;min-height:16px;margin-bottom:6px"></div>
+  <button onclick="doSidebarChangePass()" style="width:100%;padding:8px;border-radius:8px;background:var(--A);color:#fff;border:none;font-size:.8rem;font-weight:700;cursor:pointer;margin-bottom:10px">Cambiar contraseña</button>
+  <div style="border-top:1px solid var(--bd);padding-top:10px">
+    <button onclick="doLogout()" style="width:100%;padding:8px;border-radius:8px;background:transparent;color:var(--red);border:1.5px solid var(--red);font-size:.8rem;font-weight:700;cursor:pointer">↩ Cerrar sesión</button>
+  </div>
+</div>
 </body>
 </html>
