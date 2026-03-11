@@ -686,7 +686,8 @@ select option{background:var(--S);}
 }
 .prof-card{
   background:#161B22;border:1px solid #2D3748;border-radius:24px;
-  padding:48px 40px;max-width:520px;width:90%;text-align:center;
+  padding:32px 40px;max-width:520px;width:90%;text-align:center;
+  max-height:90vh;overflow-y:auto;
 }
 .prof-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:32px;}
 .prof-logo-text{font-size:1.3rem;font-weight:800;color:#fff;}
@@ -743,7 +744,7 @@ select option{background:var(--S);}
     <!-- STEP 2: health sub-specialty (hidden by default) -->
     <div id="profStep2" style="display:none">
       <div style="font-size:.82rem;color:#10B981;font-weight:700;margin-bottom:14px;text-align:left;">¿Cuál es tu especialidad?</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:300px;overflow-y:auto;padding-right:4px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:55vh;overflow-y:auto;padding-right:4px;">
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('psicologo')"><div class="prof-opt-icon" style="font-size:1.6rem">🧠</div><div class="prof-opt-name" style="font-size:.88rem">Psicólogo/a</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('psiquiatra')"><div class="prof-opt-icon" style="font-size:1.6rem">💊</div><div class="prof-opt-name" style="font-size:.88rem">Psiquiatra</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('nutricionista')"><div class="prof-opt-icon" style="font-size:1.6rem">🥗</div><div class="prof-opt-name" style="font-size:.88rem">Nutricionista</div></div>
