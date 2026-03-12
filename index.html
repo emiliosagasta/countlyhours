@@ -913,7 +913,7 @@ select option{background:var(--S);}
       <span id="themeLabel">Modo oscuro</span>
     </button>
 
-    <div class="s-user" id="sUserBtn" onclick="showPage('perfil')">
+    <div class="s-user" id="sUserBtn" onclick="toggleSideQuick()">
       <div class="s-av" id="sAv">JD</div>
       <div style="min-width:0;flex:1">
         <div class="s-un" id="sNm">Cargando…</div>
@@ -1367,70 +1367,6 @@ select option{background:var(--S);}
       </div>
     </div>
 
-    <!-- ══ PERFIL / CONFIGURACION PERSONAL ══ -->
-    <div class="page" id="page-perfil">
-      <div class="ph" style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div class="ph-title">⚙️ Mi cuenta</div>
-          <div class="ph-sub">Personalizá tu experiencia</div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px">
-
-        <!-- COLOR -->
-        <div class="panel">
-          <div class="ptitle">🎨 Color de la app</div>
-          <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px">
-            <input type="color" id="pf-color" value="#10B981"
-              oninput="liveAccent(this.value)"
-              style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
-            <div id="pf-presets" style="display:flex;gap:7px;flex-wrap:wrap;flex:1"></div>
-          </div>
-        </div>
-
-        <!-- IDIOMA -->
-        <div class="panel">
-          <div class="ptitle">🌐 Idioma</div>
-          <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
-            <button onclick="setLang('es')" id="pf-es" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇪🇸 Español</button>
-            <button onclick="setLang('en')" id="pf-en" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇬🇧 English</button>
-            <button onclick="setLang('ca')" id="pf-ca" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🏴 Català</button>
-            <button onclick="setLang('it')" id="pf-it" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇮🇹 Italiano</button>
-            <button onclick="setLang('zh')" id="pf-zh" class="lang-chip" style="font-size:.85rem;padding:9px 12px;text-align:left">🇨🇳 中文</button>
-          </div>
-        </div>
-
-        <!-- CAMBIAR CONTRASEÑA -->
-        <div class="panel" style="grid-column:span 2">
-          <div class="ptitle">🔑 Cambiar contraseña</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px">
-            <div class="field">
-              <label style="font-size:.75rem">Contraseña actual</label>
-              <input type="password" id="pf-pass0" placeholder="Tu contraseña actual">
-            </div>
-            <div class="field">
-              <label style="font-size:.75rem">Nueva contraseña</label>
-              <input type="password" id="pf-pass1" placeholder="Mínimo 8 caracteres">
-            </div>
-            <div class="field">
-              <label style="font-size:.75rem">Confirmar nueva</label>
-              <input type="password" id="pf-pass2" placeholder="Repetí la nueva contraseña">
-            </div>
-          </div>
-          <div id="pf-pass-msg" style="font-size:.8rem;min-height:18px;margin:8px 0"></div>
-          <button onclick="doPerfilChangePass()" class="btn-sc" style="padding:10px 24px">Cambiar contraseña</button>
-        </div>
-
-        <!-- CERRAR SESION -->
-        <div class="panel" style="grid-column:span 2;border:1.5px solid rgba(239,68,68,.2)">
-          <div class="ptitle" style="color:var(--red)">⚠️ Sesión</div>
-          <p style="font-size:.83rem;color:var(--mu);margin:8px 0 16px;line-height:1.6">Al cerrar sesión se eliminarán los datos locales. Tu historial en la nube permanece intacto.</p>
-          <button onclick="doLogout()" style="padding:10px 28px;background:var(--red);color:#fff;border:none;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer">↩ Cerrar sesión</button>
-        </div>
-
-      </div>
-    </div>
 
   </main>
 
@@ -2306,16 +2242,13 @@ async function doPerfilChangePass(){
   setTimeout(()=>{if(msg)msg.textContent='';},3000);
 }
 function toggleSideQuick(){
-  const panel=document.getElementById('sideQuickPanel');
+  var panel=document.getElementById('sideQuickPanel');
   if(!panel) return;
-  const isHidden = panel.getAttribute('data-open')!=='1';
-  if(isHidden){
-    panel.setAttribute('data-open','1');
-    panel.style.setProperty('display','block','important');
+  if(panel.style.display==='none'||panel.style.display===''){
+    panel.style.display='block';
     _initSideQuickPanel();
   } else {
-    panel.setAttribute('data-open','0');
-    panel.style.setProperty('display','none','important');
+    panel.style.display='none';
   }
 }
 function _initSideQuickPanel(){
@@ -3812,5 +3745,35 @@ function openTnc(){
 
 window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 </script>
+
+<!-- QUICK SETTINGS POPUP -->
+<div id="sideQuickPanel" data-open="0" style="display:none;position:fixed;bottom:62px;left:10px;width:176px;background:var(--S);border:1.5px solid var(--bd);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:9999;padding:14px;overflow-y:auto;max-height:80vh;">
+
+  <div style="font-size:.65rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🎨 COLOR</div>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+    <input type="color" id="sq-color" value="#10B981" oninput="liveAccent(this.value)" style="width:32px;height:32px;border:none;border-radius:8px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
+    <div id="sq-presets" style="display:flex;gap:4px;flex-wrap:wrap;flex:1"></div>
+  </div>
+
+  <div style="font-size:.65rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🌐 IDIOMA</div>
+  <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+    <button onclick="setLang('es')" id="sq-es" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇪🇸 Español</button>
+    <button onclick="setLang('en')" id="sq-en" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇬🇧 English</button>
+    <button onclick="setLang('ca')" id="sq-ca" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🏴 Català</button>
+    <button onclick="setLang('it')" id="sq-it" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇮🇹 Italiano</button>
+    <button onclick="setLang('zh')" id="sq-zh" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇨🇳 中文</button>
+  </div>
+
+  <div style="font-size:.65rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🔑 CONTRASEÑA</div>
+  <input type="password" id="sq-pass0" placeholder="Contraseña actual" style="width:100%;padding:7px 8px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.77rem;margin-bottom:5px;box-sizing:border-box">
+  <input type="password" id="sq-pass1" placeholder="Nueva (mín. 8)" style="width:100%;padding:7px 8px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.77rem;margin-bottom:5px;box-sizing:border-box">
+  <input type="password" id="sq-pass2" placeholder="Confirmar nueva" style="width:100%;padding:7px 8px;border-radius:8px;border:1.5px solid var(--bd);background:var(--S2);color:var(--tx);font-size:.77rem;margin-bottom:5px;box-sizing:border-box">
+  <div id="sq-pass-msg" style="font-size:.72rem;min-height:14px;margin-bottom:6px"></div>
+  <button onclick="doSidebarChangePass()" style="width:100%;padding:7px;border-radius:8px;background:var(--A);color:#fff;border:none;font-size:.78rem;font-weight:700;cursor:pointer;margin-bottom:10px">Cambiar contraseña</button>
+
+  <div style="border-top:1px solid var(--bd);padding-top:10px">
+    <button onclick="doLogout()" style="width:100%;padding:7px;border-radius:8px;background:transparent;color:var(--red);border:1.5px solid var(--red);font-size:.78rem;font-weight:700;cursor:pointer">↩ Cerrar sesión</button>
+  </div>
+</div>
 </body>
 </html>
