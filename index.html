@@ -1337,7 +1337,7 @@ select option{background:var(--S);}
         <div class="chip-group" style="margin-top:10px;gap:8px">
           <button class="lang-chip active" id="lang-es" onclick="setLang('es')">🇪🇸 Español</button>
           <button class="lang-chip" id="lang-en" onclick="setLang('en')">🇬🇧 English</button>
-          <button class="lang-chip" id="lang-ca" onclick="setLang('ca')">🏴 Català</button>
+          <button class="lang-chip" id="lang-ca" onclick="setLang('ca')">🟡🔴 Català</button>
           <button class="lang-chip" id="lang-it" onclick="setLang('it')">🇮🇹 Italiano</button>
           <button class="lang-chip" id="lang-zh" onclick="setLang('zh')">🇨🇳 中文</button>
         </div>
@@ -3645,7 +3645,7 @@ function setLang(lang){
       if(el) el.classList.toggle('active',l===lang);
     });
   });
-  toast(lang==='es'?'🇪🇸 Español':lang==='en'?'🇬🇧 English':lang==='ca'?'🏴 Català':lang==='fr'?'🇫🇷 Français':lang==='it'?'🇮🇹 Italiano':'🇨🇳 中文','#10B981');
+  toast(lang==='es'?'🇪🇸 Español':lang==='en'?'🇬🇧 English':lang==='ca'?'🟡🔴 Català':lang==='fr'?'🇫🇷 Français':lang==='it'?'🇮🇹 Italiano':'🇨🇳 中文','#10B981');
 }
 function applyLang(){
   const l=S.lang||'es';
@@ -3816,7 +3816,7 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
   <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
     <button onclick="setLang('es')" id="sq-es" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇪🇸 Español</button>
     <button onclick="setLang('en')" id="sq-en" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇬🇧 English</button>
-    <button onclick="setLang('ca')" id="sq-ca" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🏴 Català</button>
+    <button onclick="setLang('ca')" id="sq-ca" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🟡🔴 Català</button>
     <button onclick="setLang('it')" id="sq-it" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇮🇹 Italiano</button>
     <button onclick="setLang('zh')" id="sq-zh" class="lang-chip" style="font-size:.8rem;padding:7px 10px;text-align:left">🇨🇳 中文</button>
   </div>
