@@ -1896,6 +1896,9 @@ async function _initUserFromSession(session){
   S.specialty=savedSpec;
   localStorage.setItem('tp_profession', savedProf);
   localStorage.setItem('tp_specialty', savedSpec);
+  // Restore lang and color from Supabase metadata (works across devices)
+  if(meta.lang) localStorage.setItem('tp_lang', meta.lang);
+  if(meta.accent) localStorage.setItem('tp_colors', JSON.stringify({a:meta.accent}));
   await loadData();
   startApp();
 }
@@ -3591,6 +3594,7 @@ function liveAccent(v){
   S.colors={a:v};
   applyColors({a:v});
   saveData();
+  if(_SB&&S.user) _SB.auth.updateUser({data:{accent:v}}).catch(()=>{});
 }
 function applyPresetAccent(v){
   document.getElementById('cp-a').value=v; liveAccent(v);
@@ -3633,6 +3637,7 @@ function toggleTheme(){applyTheme(S.theme==='dark'?'light':'dark');}
 /* ═══ LANG ═══ */
 function setLang(lang){
   S.lang=lang; applyLang(); saveData();
+  if(_SB&&S.user) _SB.auth.updateUser({data:{lang:lang}}).catch(()=>{});
   // Sync active state on both profile chips and salud settings chips
   ['es','en','ca','it','zh','fr'].forEach(l=>{
     ['lang-','slang-','sq-','pf-'].forEach(pfx=>{
