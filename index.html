@@ -931,7 +931,7 @@ select option{background:var(--S);}
          onmouseover="this.style.borderColor='var(--A)';this.style.color='var(--A)'"
          onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--mu)'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        Contacto
+        <span data-t="contact">Contacto</span>
       </a>
     </div>
   </nav>
@@ -988,7 +988,7 @@ select option{background:var(--S);}
             <div class="ptitle"><span data-t="goal-title">🎯 Meta del mes</span></div>
             <div class="goal-edit-wrap">
               <span style="font-size:.7rem;color:var(--mu)">€</span>
-              <input type="number" id="goalInput" class="goal-inp" placeholder="¿Cuánto querés ganar este mes?"
+              <input type="number" id="goalInput" class="goal-inp" id="goalPlaceholder" placeholder="¿Cuánto querés ganar este mes?"
                 onchange="saveGoal(this.value)" oninput="if(!this.value)saveGoal(0)"
                 min="0" step="50" title="Ingresá tu meta mensual en euros">
             </div>
@@ -1948,8 +1948,8 @@ const LANGS = {
     'add-here':'+ Agregar turno en este día','select-day':'Seleccioná un día','no-day-shifts':'Sin turnos en este día.',
     pending:'📌 Pendiente',
     'vs-prev':'VS. MES ANTERIOR','no-history':'Sin historial','prev-label':'Anterior','curr-label':'Actual',
-    'best-shift':'💰 Mejor turno del mes','no-shifts-yet':'Sin turnos','register-shifts':'Registrá turnos',
-    'goal-title':'🎯 Meta del mes','goal-placeholder':'¿Cuánto querés ganar este mes?',
+    'best-shift':'💰 Mejor turno del mes','no-shifts-yet':tl('no-shifts-yet'),'register-shifts':tl('register-shifts'),
+    'goal-title':'🎯 Meta del mes','goal-placeholder':'¿Cuánto querés ganar este mes? 💰',
     'confirmed':'Confirmado','remaining':'Restante',
     'ranking-title':'🏆 Ranking de clientes este mes','no-shifts-month':'Sin turnos este mes.',
     'best-day-title':'📊 Mejor día & franja horaria','no-data':tl('no-data'),
@@ -1959,7 +1959,7 @@ const LANGS = {
     'filter-all':'Todas','filter-pending':'Pendientes','filter-confirmed':'Confirmadas',
     'mark-confirm':'Confirmar','mark-delete':'Eliminar',
     'no-ett-selected':'Seleccioná una ETT…','no-etts':'No tenés ETTs',
-    'curr-month':'Mes actual',
+    'curr-month':'Mes actual','contact':'Contacte','contact':'Contacto',
     months:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
     days:['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
   },
@@ -2002,7 +2002,7 @@ const LANGS = {
     'filter-all':'All','filter-pending':'Pending','filter-confirmed':'Confirmed',
     'mark-confirm':'Confirm','mark-delete':'Delete',
     'no-ett-selected':'Select an agency…','no-etts':'No agencies yet',
-    'curr-month':'Current month',
+    'curr-month':'Current month','contact':'Contact',
     months:['January','February','March','April','May','June','July','August','September','October','November','December'],
     days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
   },
@@ -2045,7 +2045,7 @@ const LANGS = {
     'filter-all':'Totes','filter-pending':'Pendents','filter-confirmed':'Confirmades',
     'mark-confirm':'Confirmar','mark-delete':'Eliminar',
     'no-ett-selected':'Selecciona una ETT…','no-etts':'No tens ETTs',
-    'curr-month':'Mes actual',
+    'curr-month':'Mes actual','contact':'Contacte','contact':'Contacto',
     months:['Gener','Febrer','Març','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre'],
     days:['Dg','Dl','Dt','Dc','Dj','Dv','Ds'],
   },
@@ -2088,7 +2088,7 @@ const LANGS = {
     'filter-all':'Tutte','filter-pending':'In attesa','filter-confirmed':'Confermate',
     'mark-confirm':'Conferma','mark-delete':'Elimina',
     'no-ett-selected':'Seleziona un\'agenzia…','no-etts':'Nessuna agenzia',
-    'curr-month':'Mese corrente',
+    'curr-month':'Mese corrente','contact':'Contatto',
     months:['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
     days:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
   },
@@ -2131,7 +2131,7 @@ const LANGS = {
     'filter-all':'全部','filter-pending':'待确认','filter-confirmed':'已确认',
     'mark-confirm':'确认','mark-delete':'删除',
     'no-ett-selected':'选择机构…','no-etts':'暂无机构',
-    'curr-month':'当前月份',
+    'curr-month':'当前月份','contact':'联系我们',
     months:['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
     days:['日','一','二','三','四','五','六'],
   }
@@ -2813,7 +2813,7 @@ function renderInsights(){
     projHTML=`<span style="color:var(--tx)">€ ${proj.dailyAvg.toFixed(2)}<span style="font-size:.75rem;font-weight:500;color:var(--mu)">/día</span></span>`;
   }
 
-  let deltaHTML='<span class="delta-flat">Sin historial</span>';
+  let deltaHTML='<span class="delta-flat">'+tl('no-history')+'</span>';
   if(delta!==null){
     const sign=delta>0?'+':'';
     const cls=delta>0?'delta-up':delta<0?'delta-down':'delta-flat';
@@ -2827,15 +2827,15 @@ function renderInsights(){
   const bestShiftHTML=bestShift
     ?`<span style="color:var(--grn)">€${bestShift.totA.toFixed(2)}</span>`
     :'<span style="color:var(--mu);font-size:.8rem">Sin turnos</span>';
-  const bestShiftSub=bestShift?`${bestShift.date} · ${bestShift.ettName||'—'}`:'Registrá turnos';
+  const bestShiftSub=bestShift?`${bestShift.date} · ${bestShift.ettName||'—'}`:tl('register-shifts');
 
   el.innerHTML=`
     <div class="insight-card">
       <div class="insight-icon">📊</div>
       <div class="insight-body">
-        <div class="insight-label">vs. mes anterior</div>
+        <div class=\"insight-label\">${tl('vs-prev')}</div>
         <div class="insight-value">${deltaHTML}</div>
-        <div class="insight-sub">Anterior: €${prev.toFixed(0)} · Actual: €${cur.toFixed(0)}</div>
+        <div class="insight-sub">${tl('prev-label')}: €${prev.toFixed(0)} · ${tl('curr-label')}: €${cur.toFixed(0)}</div>
       </div>
     </div>
     <div class="insight-card">
@@ -2876,8 +2876,8 @@ function renderEttRanking(){
 /* ═══ F7: MEJOR DÍA Y FRANJA HORARIA ═══ */
 function renderBestDayStats(){
   const el=document.getElementById('bestDayStats'); if(!el) return;
-  if(!S.shifts.length){el.innerHTML='<p style="color:var(--mu);font-size:.82rem;padding:8px 0">Sin datos todavía.</p>';return;}
-  const DAYS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  if(!S.shifts.length){el.innerHTML='<p style="color:var(--mu);font-size:.82rem;padding:8px 0">'+tl('no-data')+'</p>';return;}
+  const DAYS=(LANGS[S.lang]||LANGS.es).days;
   const byDay={}, bySlot={'Mañana (6-14)':0,'Tarde (14-22)':0,'Noche (22-6)':0};
   S.shifts.forEach(s=>{
     const dow=new Date(s.date).getDay();
@@ -3281,7 +3281,7 @@ function calAddHere(){
 /* ═══ HISTORY ═══ */
 function renderHistory(){
   const el=document.getElementById('histContent');
-  if(!S.shifts.length){el.innerHTML='<div class="empty"><div class="empty-icon">📆</div><p>Sin historial todavía.</p></div>';return;}
+  if(!S.shifts.length){el.innerHTML='<div class="empty"><div class="empty-icon">📆</div><p>'+tl('no-history')+'</p></div>';return;}
   const byMonth={};
   S.shifts.forEach(s=>{
     const key=s.date.slice(0,7);
@@ -3648,6 +3648,9 @@ function applyLang(){
     const span=b.querySelector('[data-t]');
     if(span){ const v=tl(k); if(v&&typeof v==='string') span.textContent=v; }
   });
+  // Update goal placeholder
+  const gp=document.getElementById('goalPlaceholder');
+  if(gp) gp.placeholder=tl('goal-placeholder');
   // Re-render dynamic content with new language
   if(typeof renderAll==='function' && document.getElementById('app') && document.getElementById('app').style.display!=='none'){
     renderAll();
