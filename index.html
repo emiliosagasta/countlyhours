@@ -3582,9 +3582,13 @@ function buildPresets(){
       onclick="applyPresetAccent('${c}')"></div>`).join('');
 }
 function liveAccent(v){
-  document.getElementById('cpv-a').style.background=v;
-  document.getElementById('cph-a').textContent=v.toUpperCase();
+  const cpv=document.getElementById('cpv-a');
+  const cph=document.getElementById('cph-a');
+  if(cpv) cpv.style.background=v;
+  if(cph) cph.textContent=v.toUpperCase();
+  S.colors={a:v};
   applyColors({a:v});
+  saveData();
 }
 function applyPresetAccent(v){
   document.getElementById('cp-a').value=v; liveAccent(v);
