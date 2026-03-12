@@ -1368,6 +1368,60 @@ select option{background:var(--S);}
     </div>
 
 
+    <!-- ══ ADMIN PANEL ══ -->
+    <div class="page" id="page-admin">
+      <div class="ph">
+        <div>
+          <div class="ph-title">🛡️ Panel de Administración</div>
+          <div class="ph-sub">Solo visible para superusuarios</div>
+        </div>
+        <button onclick="adminLoadData()" class="btn-sc">🔄 Actualizar</button>
+      </div>
+
+      <!-- MÉTRICAS -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px" id="adminMetrics">
+        <div class="panel" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:var(--A)" id="adminTotalUsers">—</div>
+          <div style="font-size:.75rem;color:var(--mu);margin-top:4px">Usuarios totales</div>
+        </div>
+        <div class="panel" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:#10B981" id="adminActiveUsers">—</div>
+          <div style="font-size:.75rem;color:var(--mu);margin-top:4px">Activos (7 días)</div>
+        </div>
+        <div class="panel" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:#F59E0B" id="adminHosteleria">—</div>
+          <div style="font-size:.75rem;color:var(--mu);margin-top:4px">Hostelería</div>
+        </div>
+        <div class="panel" style="text-align:center">
+          <div style="font-size:2rem;font-weight:800;color:#8B5CF6" id="adminSalud">—</div>
+          <div style="font-size:.75rem;color:var(--mu);margin-top:4px">Salud</div>
+        </div>
+      </div>
+
+      <!-- TABLA USUARIOS -->
+      <div class="panel">
+        <div class="ptitle" style="margin-bottom:14px">👥 Usuarios registrados</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:.82rem" id="adminUsersTable">
+            <thead>
+              <tr style="border-bottom:2px solid var(--bd)">
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Email</th>
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Nombre</th>
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Profesión</th>
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Plan</th>
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Idioma</th>
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Último acceso</th>
+                <th style="text-align:left;padding:8px 12px;color:var(--mu);font-weight:600">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersBody">
+              <tr><td colspan="7" style="padding:20px;text-align:center;color:var(--mu)">Cargando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- MOBILE NAV -->
@@ -1900,6 +1954,25 @@ async function _initUserFromSession(session){
   if(meta.lang) localStorage.setItem('tp_lang', meta.lang);
   if(meta.accent) localStorage.setItem('tp_colors', JSON.stringify({a:meta.accent}));
   await loadData();
+  // Check if user is admin
+  try {
+    const adminCheck = await _SB.from('admins').select('email').eq('email', u.email).single();
+    S.isAdmin = !adminCheck.error && !!adminCheck.data;
+  } catch(e) { S.isAdmin = false; }
+  // Update last_seen
+  try { await _SB.rpc('update_last_seen'); } catch(e) {}
+  // Upsert profile
+  try {
+    await _SB.from('profiles').upsert({
+      id: u.id, email: u.email,
+      full_name: S.user.name,
+      profession: S.profession,
+      plan: S.plan || 'free',
+      lang: S.lang,
+      accent: S.colors.a,
+      last_seen: new Date().toISOString()
+    }, {onConflict: 'id'});
+  } catch(e) {}
   startApp();
 }
 
@@ -1915,7 +1988,7 @@ const S = {
   calMonth: new Date().getMonth(),
   calSel: null, isDemo: false,
   monthGoal: 0,
-  plan: 'free', saludRate:60, saludDuration:50, saludDias:[1,2,3,4,5], saludMetaSesiones:20
+  plan: 'free', isAdmin: false, saludRate:60, saludDuration:50, saludDias:[1,2,3,4,5], saludMetaSesiones:20
 };;
 
 const ETT_COLORS = ['#2563EB','#06B6D4','#F97316','#EF4444','#10B981','#EC4899','#8B5CF6','#F59E0B','#0F172A','#64748B'];
@@ -2155,7 +2228,7 @@ function showAuthError(id, msg){ const el=document.getElementById(id); if(!el)re
 
 async function loginGoogle(){
   if(!_SB){toast('Supabase no disponible','#EF4444');return;}
-  var r=await _SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.href}});
+  var r=await _SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://countlyhours.es'}});
   if(r.error)toast('Error Google: '+r.error.message,'#EF4444');
 }
 function loginDemo(prof){
@@ -2279,6 +2352,78 @@ async function doPerfilChangePass(){
   ['pf-pass0','pf-pass1','pf-pass2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   setTimeout(()=>{if(msg)msg.textContent='';},3000);
 }
+// ═══ ADMIN FUNCTIONS ═══
+async function adminLoadData(){
+  if(!S.isAdmin){ toast('No autorizado','#EF4444'); return; }
+  const tbody = document.getElementById('adminUsersBody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="7" style="padding:20px;text-align:center;color:var(--mu)">Cargando…</td></tr>';
+  try {
+    const r = await _SB.rpc('get_all_users_for_admin');
+    if(r.error) throw new Error(r.error.message);
+    const users = r.data || [];
+    // Update metrics
+    const now = new Date();
+    const sevenDaysAgo = new Date(now - 7*24*60*60*1000);
+    const active = users.filter(u => u.last_seen && new Date(u.last_seen) > sevenDaysAgo);
+    const hosteleria = users.filter(u => u.profession !== 'salud');
+    const salud = users.filter(u => u.profession === 'salud');
+    const el = id => document.getElementById(id);
+    if(el('adminTotalUsers')) el('adminTotalUsers').textContent = users.length;
+    if(el('adminActiveUsers')) el('adminActiveUsers').textContent = active.length;
+    if(el('adminHosteleria')) el('adminHosteleria').textContent = hosteleria.length;
+    if(el('adminSalud')) el('adminSalud').textContent = salud.length;
+    // Render table
+    if(!tbody) return;
+    if(!users.length){
+      tbody.innerHTML = '<tr><td colspan="7" style="padding:20px;text-align:center;color:var(--mu)">Sin usuarios todavía</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => {
+      const lastSeen = u.last_seen ? new Date(u.last_seen).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+      const createdAt = u.created_at ? new Date(u.created_at).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
+      const planBadge = u.plan === 'pro' 
+        ? '<span style="background:#F59E0B;color:#fff;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700">PRO</span>'
+        : u.plan === 'business'
+        ? '<span style="background:#8B5CF6;color:#fff;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700">BIZ</span>'
+        : '<span style="background:var(--bd);color:var(--mu);padding:2px 8px;border-radius:20px;font-size:.7rem">FREE</span>';
+      const profBadge = u.profession === 'salud'
+        ? '<span style="color:#8B5CF6">👩‍⚕️ Salud</span>'
+        : '<span style="color:#10B981">🍽️ Host.</span>';
+      return `<tr style="border-bottom:1px solid var(--bd);transition:background .15s" 
+               onmouseover="this.style.background='var(--S2)'" 
+               onmouseout="this.style.background='transparent'">
+        <td style="padding:10px 12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||'—'}</td>
+        <td style="padding:10px 12px">${u.full_name||'—'}</td>
+        <td style="padding:10px 12px">${profBadge}</td>
+        <td style="padding:10px 12px">${planBadge}</td>
+        <td style="padding:10px 12px">${u.lang||'es'}</td>
+        <td style="padding:10px 12px;color:var(--mu);font-size:.78rem">${lastSeen}</td>
+        <td style="padding:10px 12px">
+          <select onchange="adminChangePlan('${u.email}',this.value)" 
+            style="font-size:.75rem;padding:4px 6px;border-radius:6px;border:1px solid var(--bd);background:var(--S2);color:var(--tx);cursor:pointer">
+            <option value="free" ${u.plan==='free'?'selected':''}>Free</option>
+            <option value="pro" ${u.plan==='pro'?'selected':''}>Pro</option>
+            <option value="business" ${u.plan==='business'?'selected':''}>Business</option>
+          </select>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    if(tbody) tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;text-align:center;color:#EF4444">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function adminChangePlan(email, plan){
+  if(!S.isAdmin) return;
+  try {
+    const r = await _SB.rpc('admin_set_plan', {target_email: email, new_plan: plan});
+    if(r.error) throw new Error(r.error.message);
+    toast(`✓ Plan de ${email} → ${plan.toUpperCase()}`, '#10B981');
+  } catch(e) {
+    toast('Error: ' + e.message, '#EF4444');
+  }
+}
+
 function toggleSideQuick(){
   var panel=document.getElementById('sideQuickPanel');
   if(!panel) return;
@@ -2479,6 +2624,7 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id)?.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  if(id==='admin') adminLoadData();
   if(id==='calendar') renderCalendar();
   if(id==='history')  renderHistory();
   if(id==='settings') syncSettingsUI();
@@ -3575,8 +3721,10 @@ function updateUserUI(){
   document.getElementById('pEm').textContent=S.user.email;
   const badge=document.getElementById('demoBadge');
   if(badge) badge.style.display=S.isDemo?'block':'none';
+  // Show/hide admin nav button
+  const adminBtn = document.getElementById('adminNavBtn');
+  if(adminBtn) adminBtn.style.display = S.isAdmin ? 'flex' : 'none';
 }
-
 /* ═══ COLORS ═══ */
 function buildPresets(){
   const el=document.getElementById('prs-a'); if(!el) return;
