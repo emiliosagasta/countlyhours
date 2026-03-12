@@ -1879,7 +1879,7 @@ function _updMock(total,nH,count){
 async function _initUserFromSession(session){
   localStorage.setItem('tp_hasLoggedIn','1');
   _hideAllScreens();
-  document.getElementById('app').style.display='flex';
+  document.getElementById('app').style.display='block';
   var u=session.user;
   S.user={
     id:u.id,
@@ -2389,7 +2389,7 @@ if(_SB)_SB.auth.onAuthStateChange(async(event,session)=>{
     showView('reset');
     return;
   }
-  if(event==='SIGNED_IN'&&session) await _initUserFromSession(session);
+  if(event==='SIGNED_IN'&&session&&!S.user) await _initUserFromSession(session);
   else if(event==='SIGNED_OUT'){
     S.user=null;S.shifts=[];S.etts=[];
     document.getElementById('app').style.display='none';
@@ -3582,10 +3582,12 @@ function buildPresets(){
       onclick="applyPresetAccent('${c}')"></div>`).join('');
 }
 function liveAccent(v){
-  const cpv=document.getElementById('cpv-a');
-  const cph=document.getElementById('cph-a');
-  if(cpv) cpv.style.background=v;
-  if(cph) cph.textContent=v.toUpperCase();
+  try{
+    const cpv=document.getElementById('cpv-a');
+    const cph=document.getElementById('cph-a');
+    if(cpv) cpv.style.background=v;
+    if(cph) cph.textContent=v.toUpperCase();
+  }catch(e){}
   S.colors={a:v};
   applyColors({a:v});
   saveData();
