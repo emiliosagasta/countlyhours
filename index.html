@@ -3747,8 +3747,12 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 </script>
 
 <!-- QUICK SETTINGS POPUP -->
-<div id="sideQuickPanel" data-open="0" style="display:none;position:fixed;bottom:62px;left:10px;width:176px;background:var(--S);border:1.5px solid var(--bd);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:9999;padding:14px;overflow-y:auto;max-height:80vh;">
+<div id="sideQuickPanel" data-open="0" style="display:none;position:fixed;top:0;left:196px;width:260px;height:100vh;background:var(--S);border-right:1.5px solid var(--bd);box-shadow:4px 0 24px rgba(0,0,0,.15);z-index:9999;padding:20px 16px;overflow-y:auto;">
 
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <span style="font-size:.85rem;font-weight:700;color:var(--tx)">⚙️ Mi cuenta</span>
+    <button onclick="toggleSideQuick()" style="width:28px;height:28px;border-radius:50%;background:#EF4444;color:#fff;border:none;font-size:1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+  </div>
   <div style="font-size:.65rem;font-weight:700;color:var(--mu);letter-spacing:.06em;margin-bottom:8px">🎨 COLOR</div>
   <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
     <input type="color" id="sq-color" value="#10B981" oninput="liveAccent(this.value)" style="width:32px;height:32px;border:none;border-radius:8px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
