@@ -1588,10 +1588,17 @@ select option{background:var(--S);}
 <script>
 const _SB=(()=>{try{
   if(!window.supabase) return null;
+  // Custom lock to prevent multi-tab deadlock on mobile browsers
+  const noopLock = async(name, opts, fn) => { try{ return await fn(); }catch(e){ return fn(); } };
   return window.supabase.createClient(
     'https://osgozfsegosxlrpyxajx.supabase.co',
     'sb_publishable_uGI8_2iR7Ju-5V4YRyKWYg_cduaB--E',
-    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+    { auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        lock: noopLock
+    }}
   );
 }catch(e){return null;}})();
 
