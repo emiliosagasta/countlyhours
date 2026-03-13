@@ -758,12 +758,12 @@ select option{background:var(--S);}
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('coach')"><div class="prof-opt-icon" style="font-size:1.6rem">🎯</div><div class="prof-opt-name" style="font-size:.88rem">Coach</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('medico')"><div class="prof-opt-icon" style="font-size:1.6rem">👨‍⚕️</div><div class="prof-opt-name" style="font-size:.88rem">Médico/a general</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('salud-integral')"><div class="prof-opt-icon" style="font-size:1.6rem">🌿</div><div class="prof-opt-name" style="font-size:.88rem">Salud integral</div></div>
-        <div class="prof-opt prof-opt-sm" onclick="selectProfession('otro-salud')"><div class="prof-opt-icon" style="font-size:1.6rem">⚕️</div><div class="prof-opt-name" style="font-size:.88rem">Otra especialidad</div></div>
+        <div class="prof-opt prof-opt-sm" onclick="selectProfession('otro salud')"><div class="prof-opt-icon" style="font-size:1.6rem">⚕️</div><div class="prof-opt-name" style="font-size:.88rem">Otra especialidad</div></div>
       </div>
       <button class="prof-back" style="margin-top:14px" onclick="backToStep1()">← Volver</button>
     </div>
 
-    <button class="prof-continue" id="profContinueBtn" onclick="confirmProfession()">Continuar →</button>
+    <button class="prof-continue" id="profContinueBtn" onclick="confirmProfession()" style="position:sticky;bottom:16px;margin-top:8px;box-shadow:0 4px 20px rgba(16,185,129,.4)">Continuar →</button>
     <button class="prof-back" id="profBackLogin" onclick="showAuthFromLanding('login')">← Ya tengo cuenta, iniciar sesión</button>
   </div>
 </div>
@@ -1654,15 +1654,29 @@ function selectSector(sector){
 
 // Step 2: choose health specialty
 function selectProfession(p){
-  document.querySelectorAll('#profStep2 .prof-opt').forEach(el=>el.classList.remove('selected'));
-  if(event&&event.currentTarget) event.currentTarget.classList.add('selected');
+  const cards = document.querySelectorAll('#profStep2 .prof-opt');
+  const clickedCard = event&&event.currentTarget;
+  // Toggle: click same card again → deselect
+  const wasSelected = clickedCard && clickedCard.classList.contains('selected');
+  cards.forEach(el=>el.classList.remove('selected'));
+  const btn=document.getElementById('profContinueBtn');
+  if(wasSelected){
+    // Deselect — hide button
+    btn.classList.remove('active');
+    btn.dataset.selected='';
+    S.specialty='';
+    document.getElementById('profBackLogin').style.display='none';
+    return;
+  }
+  if(clickedCard) clickedCard.classList.add('selected');
   S.profession='salud';
   S.specialty=p;
-  const btn=document.getElementById('profContinueBtn');
   btn.style.display='block';
   btn.classList.add('active');
   btn.dataset.selected=p;
   document.getElementById('profBackLogin').style.display='block';
+  // Scroll button into view smoothly
+  setTimeout(()=>btn.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
 }
 
 function backToStep1(){
@@ -1700,8 +1714,16 @@ function _populateRegProfDropdown(){
   if(lbl) lbl.textContent=isSalud?'Especialidad':'Profesión';
   sel.innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
   if(isSalud && S.specialty){
-    const match=opts.find(o=>o.v===S.specialty||o.l.toLowerCase().startsWith(S.specialty.toLowerCase().split('/')[0]));
+    // Exact match first, then partial
+    const specialty = S.specialty.replace(/-/g,' ').toLowerCase();
+    const match=opts.find(o=>
+      o.v===S.specialty ||
+      o.v.replace(/-/g,' ')===specialty ||
+      o.l.toLowerCase()===specialty ||
+      o.l.toLowerCase().startsWith(specialty.split('/')[0])
+    );
     if(match) sel.value=match.v;
+    else sel.value=opts[0]?opts[0].v:'';
   }
 }
 
@@ -2334,6 +2356,13 @@ async function doRegister(){
     } else {
       showAuthError('regError',msg);
     }
+    return;
+  }
+  // Supabase silently succeeds for existing emails when email confirm is ON
+  // Detect this: user exists but has no new identity (identities array is empty)
+  if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){
+    var msg2='Este correo ya está registrado. ¿Querés <a onclick="showView(\'login\')" style="color:var(--A);cursor:pointer;text-decoration:underline">iniciar sesión</a>?';
+    document.getElementById('regError').innerHTML='<div style="color:#EF4444;font-size:.82rem;padding:10px 14px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">'+msg2+'</div>';
     return;
   }
   var ve=document.getElementById('verifyEmail')||document.getElementById('rg-verify-email');
