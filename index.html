@@ -1,3 +1,10 @@
+
+  #page-profile .panel{padding:16px!important;}
+  #page-profile{padding-bottom:80px!important;}
+
+  .modal-ov{z-index:10000!important;}
+  .modal{max-width:95vw!important;max-height:85vh!important;overflow-y:auto;}
+  #sideQuickPanel{z-index:9999!important;}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -308,7 +315,7 @@ select option{background:var(--S);}
 .theme-big-chip:hover:not(.active){background:var(--S2);}
 
 /* MODAL */
-.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-ov.open{opacity:1;pointer-events:all;}
 .modal{background:var(--S);border:1px solid var(--bd);border-radius:14px;padding:24px 26px;max-width:430px;width:100%;box-shadow:var(--shlg);transform:translateY(8px);transition:transform .2s;}
 .modal-ov.open .modal{transform:translateY(0);}
@@ -1346,7 +1353,6 @@ select option{background:var(--S);}
           <button class="lang-chip" id="lang-en" onclick="setLang('en')">🇬🇧 English</button>
           <button class="lang-chip" id="lang-ca" onclick="setLang('ca')">🟡🔴 Català</button>
           <button class="lang-chip" id="lang-it" onclick="setLang('it')">🇮🇹 Italiano</button>
-          <button class="lang-chip" id="lang-zh" onclick="setLang('zh')">🇨🇳 中文</button>
         </div>
         <div class="prof-divider"></div>
 
@@ -1369,8 +1375,8 @@ select option{background:var(--S);}
         <div class="prof-divider"></div>
 
         <!-- Actions -->
-        <button class="btn-sc" style="width:100%;padding:13px;font-size:.95rem;margin-bottom:10px" onclick="saveProfile()" id="t-save-btn">Guardar</button>
-        <button class="btn-lo" onclick="doLogout()">↩ <span id="t-logout">Cerrar sesión</span></button>
+        <button class="btn-sc" style="width:100%;padding:13px;font-size:.95rem;margin-bottom:10px" onclick="saveProfile()" id="t-save-btn" data-t="save-btn">Guardar</button>
+        <button class="btn-lo" onclick="doLogout()">↩ <span id="t-logout" data-t="logout">Cerrar sesión</span></button>
       </div>
     </div>
 
@@ -1436,9 +1442,9 @@ select option{background:var(--S);}
     <div class="mob-nav-inner">
       <button class="mob-nav-btn active" onclick="showPage('dashboard');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📊</span><span>Dashboard</span></button>
       <button class="mob-nav-btn" onclick="showPage('calendar');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📅</span><span>Calendario</span></button>
-      <button class="mob-nav-btn" onclick="showPage('history');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📆</span><span>Historial</span></button>
+      <button class="mob-nav-btn" onclick="showPage('history');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
       <button class="mob-nav-btn" onclick="showPage('etts');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">🏢</span><span>ETTs</span></button>
-      <button class="mob-nav-btn" onclick="showPage('profile');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">👤</span><span>Perfil</span></button>
+      <button class="mob-nav-btn" onclick="showPage('profile');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
     </div>
   </div>
 
@@ -1446,11 +1452,11 @@ select option{background:var(--S);}
   <!-- MOBILE BOTTOM NAV -->
   <div class="mob-nav">
     <div class="mob-nav-inner">
-      <button class="mob-nav-btn active" onclick="showPage('dashboard');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📊</span><span>Panel</span></button>
-      <button class="mob-nav-btn" onclick="showPage('calendar');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📅</span><span>Cal.</span></button>
-      <button class="mob-nav-btn" onclick="showPage('history');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📆</span><span>Historial</span></button>
+      <button class="mob-nav-btn active" onclick="showPage('dashboard');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📊</span><span data-t="dashboard">Panel</span></button>
+      <button class="mob-nav-btn" onclick="showPage('calendar');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📅</span><span data-t="calendar">Cal.</span></button>
+      <button class="mob-nav-btn" onclick="showPage('history');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
       <button class="mob-nav-btn" onclick="showPage('etts');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">🏢</span><span>ETTs</span></button>
-      <button class="mob-nav-btn" onclick="showPage('profile');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">👤</span><span>Perfil</span></button>
+      <button class="mob-nav-btn" onclick="showPage('profile');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
     </div>
   </div>
 </div>
@@ -3678,7 +3684,7 @@ function renderRateHistory(){
 
 /* ═══ ETT CRUD ═══ */
 function openEttModal(id){
-  const e=id?S.etts.find(x=>x.id===id):null;
+  const e=id?S.etts.find(x=>String(x.id)===String(id)):null;
   const isSalud=(S.profession==='salud');
 
   // Show/hide correct fields
@@ -3937,7 +3943,7 @@ function setLang(lang){
   S.lang=lang; applyLang(); saveData();
   if(_SB&&S.user) _SB.auth.updateUser({data:{lang:lang}}).catch(()=>{});
   // Sync active state on both profile chips and salud settings chips
-  ['es','en','ca','it','zh','fr'].forEach(l=>{
+  ['es','en','ca','it','fr'].forEach(l=>{
     ['lang-','slang-','sq-','pf-'].forEach(pfx=>{
       const el=document.getElementById(pfx+l);
       if(el) el.classList.toggle('active',l===lang);
@@ -4138,7 +4144,7 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
   <button onclick="doSidebarChangePass()" style="width:100%;padding:7px;border-radius:8px;background:var(--A);color:#fff;border:none;font-size:.78rem;font-weight:700;cursor:pointer;margin-bottom:10px">Cambiar contraseña</button>
 
   <div style="border-top:1px solid var(--bd);padding-top:10px">
-    <button onclick="doLogout()" style="width:100%;padding:7px;border-radius:8px;background:transparent;color:var(--red);border:1.5px solid var(--red);font-size:.78rem;font-weight:700;cursor:pointer">↩ Cerrar sesión</button>
+    <button onclick="doLogout()" style="width:100%;padding:7px;border-radius:8px;background:transparent;color:var(--red);border:1.5px solid var(--red);font-size:.78rem;font-weight:700;cursor:pointer"><span data-t="logout">↩ Cerrar sesión</span></button>
   </div>
 </div>
 </body>
