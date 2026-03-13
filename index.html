@@ -964,11 +964,11 @@ select option{background:var(--S);}
           <div class="sc-lbl" data-t="total-h">Total horas</div>
           <div class="sc-val" id="st-tH">0<span class="u">h</span></div>
           <div class="sc-sub" id="st-sh">0 turnos</div></div>
-        <div class="sc"><div class="sc-line" style="background:var(--day)"></div>
+        <div class="sc" id="statCardDay"><div class="sc-line" style="background:var(--day)"></div>
           <div class="sc-lbl" data-t="day-h">Horas diurnas</div>
           <div class="sc-val" id="st-dH">0<span class="u">h</span></div>
           <div class="sc-sub" id="st-dA">€ 0.00</div></div>
-        <div class="sc"><div class="sc-line" style="background:var(--ngt)"></div>
+        <div class="sc" id="statCardNight"><div class="sc-line" style="background:var(--ngt)"></div>
           <div class="sc-lbl" data-t="night-h">Horas nocturnas</div>
           <div class="sc-val" id="st-nH">0<span class="u">h</span></div>
           <div class="sc-sub" id="st-nA">€ 0.00</div></div>
@@ -1096,14 +1096,14 @@ select option{background:var(--S);}
               <span class="ampm-sub" id="ap-en"></span>
             </div>
           </div>
-          <div class="field">
-            <label data-t="breakdown">Desglose</label>
+          <div class="field" id="breakdownField">
+            <label data-t="breakdown" id="breakdownLabel">Desglose</label>
             <div class="hours-prev" id="hPrev">Ingresá inicio y fin…</div>
           </div>
           <div class="field span2">
             <label data-t="company" id="shiftEttLabel">ETT / Empresa</label>
             <div class="ett-ac-wrap">
-              <input type="text" id="f-ett" placeholder="Seleccioná una ETT…" id="f-ett-input" autocomplete="off"
+              <input type="text" id="f-ett" placeholder="Seleccioná una ETT…" data-ph-ett="1" id="f-ett-input" autocomplete="off"
                 oninput="onEttInput('f-ett','ettDrop','ettHint')"
                 onfocus="showAllEtts('f-ett','ettDrop','ettHint')"
                 onblur="setTimeout(()=>hideDrop('ettDrop'),220)">
@@ -1478,7 +1478,7 @@ select option{background:var(--S);}
       <div class="field" style="grid-column:span 2">
         <label>ETT / Empresa</label>
         <div class="ett-ac-wrap">
-          <input type="text" id="es-ett" placeholder="Seleccioná una ETT…" id="f-ett-input" autocomplete="off"
+          <input type="text" id="es-ett" placeholder="Seleccioná una ETT…" data-ph-ett="1" id="f-ett-input" autocomplete="off"
             oninput="onEttInput('es-ett','es-ettDrop','es-ettHint')"
             onfocus="showAllEtts('es-ett','es-ettDrop','es-ettHint')"
             onblur="setTimeout(()=>hideDrop('es-ettDrop'),220)">
@@ -1878,6 +1878,13 @@ function applyProfessionText(){
   // Filter chips label
   const fa=document.getElementById('filterAll');
   if(fa) fa.textContent=isSalud?'Todos':'Todas';
+  // Hide day/night breakdown for salud (flat rate, no split)
+  const cardDay=document.getElementById('statCardDay');
+  const cardNight=document.getElementById('statCardNight');
+  const brkField=document.getElementById('breakdownField');
+  if(cardDay) cardDay.style.display=isSalud?'none':'';
+  if(cardNight) cardNight.style.display=isSalud?'none':'';
+  if(brkField) brkField.style.display=isSalud?'none':'';
   const fbl=document.getElementById('filterBarLabel');
   if(fbl) fbl.textContent=isSalud?'Filtrar por Paciente:':'Filtrar por ETT:';
   ['ettColHeader1','ettColHeader2'].forEach(id=>{
@@ -1886,6 +1893,10 @@ function applyProfessionText(){
   });
   const fEttInput=document.getElementById('f-ett-input');
   if(fEttInput) fEttInput.placeholder=isSalud?'Seleccioná un paciente…':'Seleccioná una ETT…';
+  // Fix ALL ETT input placeholders
+  document.querySelectorAll('[data-ph-ett]').forEach(el=>{
+    el.placeholder=isSalud?'Seleccioná un paciente…':'Seleccioná una ETT…';
+  });
   // Populate register dropdown if visible
   _populateRegProfDropdown();
   // ETT modal title
@@ -2755,6 +2766,8 @@ function showPage(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   if(id==='admin') adminLoadData();
   if(id==='calendar') renderCalendar();
+  // Reapply profession text on every page change (ensures mobile ETTs label correct)
+  if(typeof applyProfessionText==='function') applyProfessionText();
   if(id==='history')  renderHistory();
   if(id==='settings') syncSettingsUI();
   if(id==='etts')     renderEttCards();
@@ -2851,8 +2864,8 @@ function calcPrev(){
   const h=calcHours(s,e,ns,ne);
   if(h.total<=0){el.innerHTML='⚠️ Revisá los horarios';el.classList.add('err');return;}
   let html=`<strong>${fmt(h.total)}h total</strong>`;
-  if(h.dH>0) html+=` <span class="pill p-day">☀ ${fmt(h.dH)}h</span>`;
-  if(h.nH>0) html+=` <span class="pill p-night">🌙 ${fmt(h.nH)}h</span>`;
+  if(h.dH>0 && S.profession!=='salud') html+=` <span class="pill p-day">☀ ${fmt(h.dH)}h</span>`;
+  if(h.nH>0 && S.profession!=='salud') html+=` <span class="pill p-night">🌙 ${fmt(h.nH)}h</span>`;
   el.innerHTML=html; el.classList.add('ok');
 }
 
@@ -2932,7 +2945,7 @@ function addShift(overrideDate){
   }
   if(!st){toast('Hora de inicio es obligatoria — Ej: 18 o 18:30 ⏰','#EF4444');return;}
   if(!en){toast('Hora de fin es obligatoria — Ej: 23 o 02:00 ⏰','#EF4444');return;}
-  if(!ettName){toast('Seleccioná una ETT de la lista 🏢','#EF4444');document.getElementById('f-ett').focus();return;}
+  if(!ettName){toast(S.profession==='salud'?'Seleccioná un paciente 👤':'Seleccioná una ETT de la lista 🏢','#EF4444');document.getElementById('f-ett').focus();return;}
   // Buscar ETT (case-insensitive)
   const ettObj=S.etts.find(e=>e.name.toLowerCase()===ettName.toLowerCase());
   if(!ettObj){
@@ -3456,8 +3469,8 @@ function _shiftRowHTML(s){
       ${s.ettName||'—'}
     </span>
     <span class="shift-hours">
-      ${s.dH>0?`<span class="pill p-day">☀ ${fmt(s.dH)}h</span>`:''}
-      ${s.nH>0?`<span class="pill p-night">🌙 ${fmt(s.nH)}h</span>`:''}
+      ${(s.dH>0&&S.profession!=='salud')?`<span class="pill p-day">☀ ${fmt(s.dH)}h</span>`:''}
+      ${(s.nH>0&&S.profession!=='salud')?`<span class="pill p-night">🌙 ${fmt(s.nH)}h</span>`:''}
     </span>
     <span class="shift-earn${s.pending?' pend-earn':''}">€ ${s.totA.toFixed(2)}</span>
     <div style="display:flex;gap:4px;align-items:center">
