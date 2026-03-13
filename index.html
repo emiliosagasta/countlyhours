@@ -1843,6 +1843,23 @@ function applyProfessionText(){
   if(fEttInput) fEttInput.placeholder=isSalud?'Seleccioná un paciente…':'Seleccioná una ETT…';
   // Populate register dropdown if visible
   _populateRegProfDropdown();
+  // ETT modal title
+  const ettMTitle2=document.getElementById('ettModalTitle');
+  if(ettMTitle2) ettMTitle2.textContent=isSalud?'Nuevo Paciente':'Nueva ETT';
+  // ETT save button
+  const ettSaveBtn=document.getElementById('ettSaveBtn');
+  if(ettSaveBtn) ettSaveBtn.textContent=isSalud?'Guardar Paciente':'Guardar ETT';
+  // ETT night label
+  const ettNightLabel=document.getElementById('ettNightLabel');
+  if(ettNightLabel) ettNightLabel.style.display=isSalud?'none':'block';
+  // Form label ETT/Empresa (desktop + mobile)
+  const shiftEttLabel=document.getElementById('shiftEttLabel');
+  if(shiftEttLabel) shiftEttLabel.textContent=isSalud?'Paciente':'ETT / Empresa';
+  const mobileEttLabel=document.getElementById('mobileEttLabel');
+  if(mobileEttLabel) mobileEttLabel.textContent=isSalud?'Paciente':'ETT / Empresa';
+  // Placeholder es-ett (mobile shift input)
+  const esEtt=document.getElementById('es-ett');
+  if(esEtt) esEtt.placeholder=isSalud?'Seleccioná un paciente…':'Seleccioná una ETT…';
 }
 
 var _MOCK_HOST=[
@@ -2427,11 +2444,25 @@ async function adminChangePlan(email, plan){
 function toggleSideQuick(){
   var panel=document.getElementById('sideQuickPanel');
   if(!panel) return;
+  var overlay=document.getElementById('sqOverlay');
   if(panel.style.display==='none'||panel.style.display===''){
     panel.style.display='block';
     _initSideQuickPanel();
+    // Show overlay on mobile
+    if(window.innerWidth<=700){
+      if(!overlay){
+        overlay=document.createElement('div');
+        overlay.id='sqOverlay';
+        overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998';
+        overlay.onclick=toggleSideQuick;
+        document.body.appendChild(overlay);
+      } else {
+        overlay.style.display='block';
+      }
+    }
   } else {
     panel.style.display='none';
+    if(overlay) overlay.style.display='none';
   }
 }
 function _initSideQuickPanel(){
@@ -3528,13 +3559,21 @@ function saveNightRange(){
   S.nightEnd=parseInt(ne.split(':')[0]);
   saveData(); toast('✓ Rango nocturno guardado','#10B981');
 }
+function deleteRateHistoryEntry(idx){
+  S.rateHistory.splice(idx,1);
+  saveData();
+  renderRateHistory();
+}
 function renderRateHistory(){
   const el=document.getElementById('rateHistoryList');
   if(!S.rateHistory.length){el.innerHTML=`<p style="color:var(--mu);font-size:.82rem">${tl('no-rate-hist')}</p>`;return;}
-  el.innerHTML=S.rateHistory.slice(0,10).map(r=>`
-    <div class="rate-hist-item">
-      <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--mu)">${r.date}</span>
-      <span>☀ €${r.dr.toFixed(2)}/h · 🌙 €${r.nr.toFixed(2)}/h</span>
+  el.innerHTML=S.rateHistory.slice(0,10).map((r,i)=>`
+    <div class="rate-hist-item" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--mu);flex-shrink:0">${r.date}</span>
+      <span style="flex:1">☀ €${r.dr.toFixed(2)}/h · 🌙 €${r.nr.toFixed(2)}/h</span>
+      <button onclick="deleteRateHistoryEntry(${i})" 
+        style="width:20px;height:20px;border-radius:50%;background:transparent;border:1.5px solid var(--red);color:var(--red);font-size:.7rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1"
+        title="Eliminar entrada">✕</button>
     </div>`).join('');
 }
 
@@ -3981,4 +4020,17 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
   </div>
 </div>
 </body>
-</html>
+</html
+  #sideQuickPanel{
+    left:0!important;
+    width:100vw!important;
+    border-right:none!important;
+    border-bottom:1.5px solid var(--bd);
+    height:auto!important;
+    max-height:90vh;
+    bottom:0;
+    top:auto!important;
+    border-radius:16px 16px 0 0;
+    box-shadow:0 -4px 24px rgba(0,0,0,.15)!important;
+  }
+>
