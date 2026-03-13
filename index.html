@@ -917,7 +917,10 @@ select option{background:var(--S);}
       <div class="s-av" id="sAv">JD</div>
       <div style="min-width:0;flex:1">
         <div class="s-un" id="sNm">Cargando…</div>
-        <div class="s-ue" id="sEm">—</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+          <div class="s-ue" id="sEm">—</div>
+          <span id="sProfBadge" style="display:none;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:20px;background:var(--A);color:#fff;white-space:nowrap"></span>
+        </div>
       </div>
       <span class="demo-badge" id="demoBadge" style="display:none">DEMO</span>
       <span id="sideQuickArrow" style="font-size:.75rem;color:var(--mu);flex-shrink:0">⚙</span>
@@ -1705,10 +1708,21 @@ function confirmProfession(){
   } else {
     S.profession='salud'; S.specialty=p;
   }
+  localStorage.setItem('tp_profession', S.profession);
+  localStorage.setItem('tp_specialty', S.specialty||'');
+  applyProfessionText();
   document.getElementById('professionScreen').style.display='none';
+  // Si viene de Google OAuth, continuar con la sesión pendiente
+  if(window._pendingSession){
+    var sess = window._pendingSession;
+    window._pendingSession = null;
+    document.getElementById('app').style.display='block';
+    _continueInitFromSession(sess);
+    return;
+  }
+  // Flujo normal: ir al registro por email
   document.getElementById('authScreen').style.display='flex';
   setTimeout(function(){ showView('register'); _populateRegProfDropdown(); },10);
-  applyProfessionText();
 }
 
 function saveSaludRate(){
@@ -2369,6 +2383,49 @@ async function doPerfilChangePass(){
   ['pf-pass0','pf-pass1','pf-pass2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   setTimeout(()=>{if(msg)msg.textContent='';},3000);
 }
+// ═══ GOOGLE OAUTH NEW USER HELPERS ═══
+
+function _showProfessionScreenForGoogle(){
+  // Reset profession screen state for Google flow
+  const btn = document.getElementById('profContinueBtn');
+  if(btn){ btn.classList.remove('active'); btn.dataset.selected=''; btn.style.display='none'; }
+  document.querySelectorAll('#professionScreen .prof-opt').forEach(el=>el.classList.remove('selected'));
+  // Hide "back to login" button — user is already logged in via Google
+  const backBtn = document.getElementById('profBackLogin');
+  if(backBtn) backBtn.style.display='none';
+  // Show the profession screen
+  document.getElementById('professionScreen').style.display='flex';
+}
+
+async function _continueInitFromSession(session){
+  var u = session.user;
+  var meta = u.user_metadata||{};
+  // Save profession to Supabase metadata
+  try {
+    await _SB.auth.updateUser({data:{profession:S.profession, specialty:S.specialty||''}});
+  } catch(e){}
+  await loadData();
+  // Check if user is admin
+  try {
+    const adminCheck = await _SB.from('admins').select('email').eq('email', u.email).single();
+    S.isAdmin = !adminCheck.error && !!adminCheck.data;
+  } catch(e){ S.isAdmin = false; }
+  // Update last_seen + upsert profile
+  try { await _SB.rpc('update_last_seen'); } catch(e){}
+  try {
+    await _SB.from('profiles').upsert({
+      id: u.id, email: u.email,
+      full_name: S.user.name,
+      profession: S.profession,
+      plan: S.plan||'free',
+      lang: S.lang,
+      accent: S.colors.a,
+      last_seen: new Date().toISOString()
+    }, {onConflict:'id'});
+  } catch(e){}
+  startApp();
+}
+
 // ═══ ADMIN FUNCTIONS ═══
 async function adminLoadData(){
   if(!S.isAdmin){ toast('No autorizado','#EF4444'); return; }
@@ -3763,6 +3820,18 @@ function updateUserUI(){
   // Show/hide admin nav button
   const adminBtn = document.getElementById('adminNavBtn');
   if(adminBtn) adminBtn.style.display = S.isAdmin ? 'flex' : 'none';
+  // Profession badge in sidebar
+  const sProfBadge = document.getElementById('sProfBadge');
+  if(sProfBadge && S.profession){
+    const isSalud = S.profession === 'salud';
+    const label = isSalud
+      ? (S.specialty ? S.specialty.charAt(0).toUpperCase()+S.specialty.slice(1) : 'Salud')
+      : '🍽️ Hostelería';
+    const emoji = isSalud ? '👩‍⚕️ ' : '';
+    sProfBadge.textContent = emoji + (isSalud && S.specialty ? S.specialty.charAt(0).toUpperCase()+S.specialty.slice(1) : (isSalud ? 'Salud' : 'Hostelería'));
+    sProfBadge.style.display = 'inline-block';
+    sProfBadge.style.background = isSalud ? '#8B5CF6' : '#10B981';
+  }
 }
 /* ═══ COLORS ═══ */
 function buildPresets(){
