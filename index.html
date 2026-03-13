@@ -119,8 +119,8 @@ select option{background:var(--S);}
 /* MAIN */
 .main{margin-left:196px;padding:26px 30px;min-height:100vh;transition:margin .3s;}
 .page{display:none;}
-.page.active{display:block;animation:fadeUp .25s ease both;}
-#page-profile.active{display:block!important;visibility:visible!important;opacity:1!important;}
+.page.active{display:block;}
+
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:10px;flex-wrap:wrap;}
 .ph-title{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;}
 .ph-sub{font-size:.8rem;color:var(--mu);margin-top:2px;}
@@ -2815,7 +2815,13 @@ function showPage(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   if(id==='profile'){
     const pp=document.getElementById('page-profile');
-    if(pp){pp.style.display='block';pp.style.visibility='visible';pp.style.opacity='1';}
+    console.log('PROFILE: pp=',pp,'display=',pp?getComputedStyle(pp).display:'N/A');
+    if(pp){
+      pp.className='page active';
+      pp.removeAttribute('style');
+      pp.style.cssText='display:block!important;visibility:visible!important;opacity:1!important;position:static!important;padding-bottom:80px;';
+      console.log('PROFILE: after force, display=',getComputedStyle(pp).display,'visibility=',getComputedStyle(pp).visibility);
+    }
     try{_initProfilePage();}catch(e){console.warn('profile init:',e);}
   }
   try{ if(id==='admin')    adminLoadData(); }catch(e){}
