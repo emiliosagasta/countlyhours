@@ -1586,7 +1586,14 @@ select option{background:var(--S);}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const _SB=(()=>{try{return window.supabase?window.supabase.createClient('https://osgozfsegosxlrpyxajx.supabase.co','sb_publishable_uGI8_2iR7Ju-5V4YRyKWYg_cduaB--E'):null;}catch(e){return null;}})();
+const _SB=(()=>{try{
+  if(!window.supabase) return null;
+  return window.supabase.createClient(
+    'https://osgozfsegosxlrpyxajx.supabase.co',
+    'sb_publishable_uGI8_2iR7Ju-5V4YRyKWYg_cduaB--E',
+    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
+  );
+}catch(e){return null;}})();
 
 
 /* ═══ LANDING ═══ */
@@ -4105,6 +4112,8 @@ function finishOnboarding(){
   }
 }
 async function initOnboarding(){
+  if(window._appInitialized) return;
+  window._appInitialized = true;
   document.getElementById('onboarding').style.display='none';
   const th=localStorage.getItem('tp_theme');
   if(th){S.theme=th;document.documentElement.setAttribute('data-theme',th);}
