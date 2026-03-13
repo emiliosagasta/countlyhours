@@ -749,15 +749,15 @@ select option{background:var(--S);}
     <div id="profStep2" style="display:none">
       <div style="font-size:.82rem;color:#10B981;font-weight:700;margin-bottom:14px;text-align:left;">¿Cuál es tu especialidad?</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:55vh;overflow-y:auto;padding-right:4px;">
-        <div class="prof-opt prof-opt-sm" onclick="selectProfession('psicologo')"><div class="prof-opt-icon" style="font-size:1.6rem">🧠</div><div class="prof-opt-name" style="font-size:.88rem">Psicólogo/a</div></div>
+        <div class="prof-opt prof-opt-sm" onclick="selectProfession('psicologo/a')"><div class="prof-opt-icon" style="font-size:1.6rem">🧠</div><div class="prof-opt-name" style="font-size:.88rem">Psicólogo/a</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('psiquiatra')"><div class="prof-opt-icon" style="font-size:1.6rem">💊</div><div class="prof-opt-name" style="font-size:.88rem">Psiquiatra</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('nutricionista')"><div class="prof-opt-icon" style="font-size:1.6rem">🥗</div><div class="prof-opt-name" style="font-size:.88rem">Nutricionista</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('terapeuta')"><div class="prof-opt-icon" style="font-size:1.6rem">🤝</div><div class="prof-opt-name" style="font-size:.88rem">Terapeuta</div></div>
-        <div class="prof-opt prof-opt-sm" onclick="selectProfession('traumatologo')"><div class="prof-opt-icon" style="font-size:1.6rem">🦴</div><div class="prof-opt-name" style="font-size:.88rem">Traumatólogo/a</div></div>
+        <div class="prof-opt prof-opt-sm" onclick="selectProfession('traumatologo/a')"><div class="prof-opt-icon" style="font-size:1.6rem">🦴</div><div class="prof-opt-name" style="font-size:.88rem">Traumatólogo/a</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('fisioterapeuta')"><div class="prof-opt-icon" style="font-size:1.6rem">💪</div><div class="prof-opt-name" style="font-size:.88rem">Fisioterapeuta</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('coach')"><div class="prof-opt-icon" style="font-size:1.6rem">🎯</div><div class="prof-opt-name" style="font-size:.88rem">Coach</div></div>
-        <div class="prof-opt prof-opt-sm" onclick="selectProfession('medico')"><div class="prof-opt-icon" style="font-size:1.6rem">👨‍⚕️</div><div class="prof-opt-name" style="font-size:.88rem">Médico/a general</div></div>
-        <div class="prof-opt prof-opt-sm" onclick="selectProfession('salud-integral')"><div class="prof-opt-icon" style="font-size:1.6rem">🌿</div><div class="prof-opt-name" style="font-size:.88rem">Salud integral</div></div>
+        <div class="prof-opt prof-opt-sm" onclick="selectProfession('medico/a')"><div class="prof-opt-icon" style="font-size:1.6rem">👨‍⚕️</div><div class="prof-opt-name" style="font-size:.88rem">Médico/a general</div></div>
+        <div class="prof-opt prof-opt-sm" onclick="selectProfession('salud integral')"><div class="prof-opt-icon" style="font-size:1.6rem">🌿</div><div class="prof-opt-name" style="font-size:.88rem">Salud integral</div></div>
         <div class="prof-opt prof-opt-sm" onclick="selectProfession('otro salud')"><div class="prof-opt-icon" style="font-size:1.6rem">⚕️</div><div class="prof-opt-name" style="font-size:.88rem">Otra especialidad</div></div>
       </div>
       <button class="prof-back" style="margin-top:14px" onclick="backToStep1()">← Volver</button>
@@ -1703,16 +1703,17 @@ function _populateRegProfDropdown(){
   if(lbl) lbl.textContent=isSalud?'Especialidad':'Profesión';
   sel.innerHTML=opts.map(o=>`<option value="${o.v}">${o.l}</option>`).join('');
   if(isSalud && S.specialty){
-    // Exact match first, then partial
-    const specialty = S.specialty.replace(/-/g,' ').toLowerCase();
-    const match=opts.find(o=>
-      o.v===S.specialty ||
-      o.v.replace(/-/g,' ')===specialty ||
-      o.l.toLowerCase()===specialty ||
-      o.l.toLowerCase().startsWith(specialty.split('/')[0])
-    );
-    if(match) sel.value=match.v;
-    else sel.value=opts[0]?opts[0].v:'';
+    // Direct match (values now unified)
+    sel.value = S.specialty;
+    // If no exact match, try partial
+    if(!sel.value || sel.value!==S.specialty){
+      const specialty = S.specialty.toLowerCase();
+      const match = opts.find(o=>
+        o.v.startsWith(specialty.split('/')[0]) ||
+        o.v.replace(/\/a$/,'')===specialty
+      );
+      if(match) sel.value=match.v;
+    }
   }
 }
 
