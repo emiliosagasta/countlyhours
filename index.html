@@ -1755,10 +1755,13 @@ function saveSaludNota(){
   S.saludNota=v; saveData(); toast('Nota guardada ✓','#10B981');
 }
 function _loadSaludSettings(){
-  if(S.saludRate) document.getElementById('cfg-salud-rate').value=S.saludRate;
-  if(S.saludDuration) document.getElementById('cfg-salud-dur').value=S.saludDuration;
-  if(S.saludMetaSesiones) document.getElementById('cfg-salud-meta').value=S.saludMetaSesiones;
+  const r=document.getElementById('cfg-salud-rate');
+  const d=document.getElementById('cfg-salud-dur');
+  const m=document.getElementById('cfg-salud-meta');
   const notaEl=document.getElementById('cfg-salud-nota');
+  if(r && S.saludRate) r.value=S.saludRate;
+  if(d && S.saludDuration) d.value=S.saludDuration;
+  if(m && S.saludMetaSesiones) m.value=S.saludMetaSesiones;
   if(notaEl && S.saludNota) notaEl.value=S.saludNota;
   if(S.saludDias){
     document.querySelectorAll('.salud-dia').forEach(b=>{
