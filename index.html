@@ -120,6 +120,7 @@ select option{background:var(--S);}
 .main{margin-left:196px;padding:26px 30px;min-height:100vh;transition:margin .3s;}
 .page{display:none;}
 .page.active{display:block;animation:fadeUp .25s ease both;}
+#page-profile.active{display:block!important;visibility:visible!important;opacity:1!important;}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:10px;flex-wrap:wrap;}
 .ph-title{font-size:1.5rem;font-weight:800;letter-spacing:-.4px;}
 .ph-sub{font-size:.8rem;color:var(--mu);margin-top:2px;}
@@ -1302,46 +1303,37 @@ select option{background:var(--S);}
 
     <!-- PROFILE -->
     <div class="page" id="page-profile" style="padding-bottom:80px">
-      <div style="padding:0 2px 20px">
-<div style="font-size:1.3rem;font-weight:800">👤 Mi perfil</div>
-        <div style="font-size:.82rem;color:var(--mu)">Configurá tu experiencia</div>
+      <div style="background:#10B981;padding:16px 16px 12px;margin:-0px -0px 16px;border-radius:0 0 16px 16px">
+        <div style="font-size:1.2rem;font-weight:800;color:#fff">👤 Mi perfil</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.75)" id="pEm">—</div>
       </div>
 
-      <!-- User card -->
-      <div style="background:var(--S);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div id="pAv" style="width:50px;height:50px;border-radius:50%;background:var(--A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;flex-shrink:0">?</div>
-          <div style="min-width:0">
-            <div style="font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pNm">—</div>
-            <div style="font-size:.8rem;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pEm">—</div>
-          </div>
-        </div>
-        <div id="profBadgeProfile" style="display:none;margin-top:10px;font-size:.78rem;padding:3px 10px;border-radius:20px;font-weight:600"></div>
-      </div>
+      <div id="pAv" style="width:60px;height:60px;border-radius:50%;background:#fff;color:#10B981;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;margin:-44px auto 8px;border:3px solid #10B981;position:relative;z-index:2">?</div>
+      <div style="text-align:center;font-weight:700;font-size:1rem;margin-bottom:16px" id="pNm">—</div>
 
       <!-- Color -->
-      <div style="background:var(--S);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px">
-        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:12px">🎨 COLOR DE LA APLICACIÓN</div>
+      <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div style="font-size:.7rem;font-weight:700;color:#64748B;letter-spacing:.8px;margin-bottom:12px">🎨 COLOR</div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:44px;height:44px;border:none;border-radius:9px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
-          <div id="cpv-a" style="width:44px;height:44px;border-radius:9px;background:#10B981;border:1px solid var(--bd);flex-shrink:0"></div>
-          <div style="font-size:.82rem;color:var(--mu);font-family:monospace" id="cph-a">#10B981</div>
+          <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:44px;height:44px;border:none;border-radius:9px;cursor:pointer;padding:2px;background:none">
+          <div id="cpv-a" style="width:44px;height:44px;border-radius:9px;background:#10B981;border:1px solid #E2E8F0"></div>
+          <span style="font-size:.82rem;color:#64748B;font-family:monospace" id="cph-a">#10B981</span>
         </div>
         <div id="prs-a" style="display:flex;flex-wrap:wrap;gap:8px"></div>
       </div>
 
       <!-- Tema -->
-      <div style="background:var(--S);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px">
-        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:12px">🌗 APARIENCIA</div>
+      <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div style="font-size:.7rem;font-weight:700;color:#64748B;letter-spacing:.8px;margin-bottom:12px">🌗 APARIENCIA</div>
         <div style="display:flex;gap:10px">
-          <button id="chip-light" onclick="applyTheme('light')" style="flex:1;padding:11px;border-radius:10px;border:2px solid var(--A);background:var(--S2);cursor:pointer;font-weight:600;font-size:.88rem;color:var(--tx)">☀️ Claro</button>
-          <button id="chip-dark" onclick="applyTheme('dark')" style="flex:1;padding:11px;border-radius:10px;border:2px solid var(--bd);background:var(--S2);cursor:pointer;font-weight:600;font-size:.88rem;color:var(--tx)">🌙 Oscuro</button>
+          <button id="chip-light" onclick="applyTheme('light')" style="flex:1;padding:10px;border-radius:10px;border:2px solid #10B981;background:#F8FAFC;cursor:pointer;font-weight:600;font-size:.88rem">☀️ Claro</button>
+          <button id="chip-dark" onclick="applyTheme('dark')" style="flex:1;padding:10px;border-radius:10px;border:2px solid #E2E8F0;background:#F8FAFC;cursor:pointer;font-weight:600;font-size:.88rem">🌙 Oscuro</button>
         </div>
       </div>
 
       <!-- Idioma -->
-      <div style="background:var(--S);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px">
-        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:12px">🌐 IDIOMA</div>
+      <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div style="font-size:.7rem;font-weight:700;color:#64748B;letter-spacing:.8px;margin-bottom:12px">🌐 IDIOMA</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           <button id="lang-es" onclick="setLang('es')" class="lang-chip active">🇪🇸 Español</button>
           <button id="lang-en" onclick="setLang('en')" class="lang-chip">🇬🇧 English</button>
@@ -1351,22 +1343,16 @@ select option{background:var(--S);}
       </div>
 
       <!-- Contraseña -->
-      <div style="background:var(--S);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px">
-        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:12px">🔑 CAMBIAR CONTRASEÑA</div>
-        <div class="field" style="margin-bottom:10px">
-          <label style="font-size:.75rem">Nueva contraseña</label>
-          <input type="password" id="prof-new-pass" placeholder="Mínimo 8 caracteres">
-        </div>
-        <div class="field" style="margin-bottom:10px">
-          <label style="font-size:.75rem">Confirmar contraseña</label>
-          <input type="password" id="prof-conf-pass" placeholder="Repetila">
-        </div>
-        <div id="prof-pass-msg" style="font-size:.78rem;min-height:16px;margin-bottom:8px"></div>
-        <button onclick="doChangePassword()" style="padding:10px 20px;border-radius:10px;border:none;background:var(--A);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem">Cambiar contraseña</button>
+      <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div style="font-size:.7rem;font-weight:700;color:#64748B;letter-spacing:.8px;margin-bottom:12px">🔑 CAMBIAR CONTRASEÑA</div>
+        <input type="password" id="prof-new-pass" placeholder="Nueva contraseña (mín. 8 caracteres)" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #E2E8F0;font-size:.88rem;margin-bottom:8px;box-sizing:border-box;font-family:inherit">
+        <input type="password" id="prof-conf-pass" placeholder="Confirmar contraseña" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #E2E8F0;font-size:.88rem;margin-bottom:8px;box-sizing:border-box;font-family:inherit">
+        <div id="prof-pass-msg" style="font-size:.78rem;min-height:16px;margin-bottom:8px;color:#EF4444"></div>
+        <button onclick="doChangePassword()" style="padding:10px 20px;border-radius:10px;border:none;background:#10B981;color:#fff;font-weight:600;cursor:pointer;font-size:.88rem">Cambiar contraseña</button>
       </div>
 
       <!-- Logout -->
-      <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:20px">
+      <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:8px">
         ↩ <span data-t="logout">Cerrar sesión</span>
       </button>
     </div>
@@ -2805,7 +2791,11 @@ function showPage(id){
   const pg=document.getElementById('page-'+id);
   if(pg) pg.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
-  try{ if(id==='profile')  _initProfilePage(); }catch(e){console.warn(e);}
+  if(id==='profile'){
+    const pp=document.getElementById('page-profile');
+    if(pp){pp.style.display='block';pp.style.visibility='visible';pp.style.opacity='1';}
+    try{_initProfilePage();}catch(e){console.warn('profile init:',e);}
+  }
   try{ if(id==='admin')    adminLoadData(); }catch(e){}
   try{ if(id==='calendar') renderCalendar(); }catch(e){}
   try{ if(id==='history')  renderHistory(); }catch(e){}
