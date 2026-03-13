@@ -1315,6 +1315,8 @@ select option{background:var(--S);}
             <div class="profile-email" id="pEm">—</div>
           </div>
         </div>
+        <!-- Profession badge -->
+        <div id="profBadgeProfile" style="margin-top:8px;font-size:.8rem;padding:4px 10px;border-radius:20px;display:inline-block;font-weight:600"></div>
         <div class="prof-divider"></div>
 
         <!-- Color -->
@@ -2393,25 +2395,42 @@ async function doVerify(){
   toast('✓ ¡Cuenta verificada!','#10B981');
 }
 function resendCode(){ toast('Código reenviado','#6366F1'); }
-function _initPerfilPage(){
-  // Sync color picker
-  const pfc=document.getElementById('pf-color');
-  if(pfc) pfc.value=S.colors.a||'#10B981';
-  // Sync lang chips
-  ['es','en','ca','it','zh'].forEach(l=>{
-    const b=document.getElementById('pf-'+l);
-    if(b) b.classList.toggle('active',S.lang===l);
+function _initPerfilPage(){ _initProfilePage(); }
+function _initProfilePage(){
+  // Sync main color picker (cp-a = the real one in page-profile)
+  const cpa = document.getElementById('cp-a');
+  if(cpa){ cpa.value = S.colors.a||'#10B981'; }
+  const cpvA = document.getElementById('cpv-a');
+  if(cpvA) cpvA.style.background = S.colors.a||'#10B981';
+  const cphA = document.getElementById('cph-a');
+  if(cphA) cphA.textContent = S.colors.a||'#10B981';
+  // Build presets
+  buildProfileColorPresets();
+  // Sync lang chips in profile page (id="lang-es" etc)
+  ['es','en','ca','it'].forEach(l=>{
+    const b=document.getElementById('lang-'+l);
+    if(b) b.classList.toggle('active', S.lang===l);
   });
-  // Build color presets
-  const presets=document.getElementById('pf-presets');
-  if(presets){
-    const cols=['#10B981','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#F97316','#ead3cc','#4a543c'];
-    presets.innerHTML=cols.map(col=>`
-      <div onclick="liveAccent('${col}');document.getElementById('pf-color').value='${col}'"
-        style="width:26px;height:26px;border-radius:7px;background:${col};cursor:pointer;
-               border:2px solid ${col===S.colors.a?'#fff':'transparent'};flex-shrink:0;transition:border .15s">
-      </div>`).join('');
-  }
+  // Sync theme chips
+  const chipL=document.getElementById('chip-light');
+  const chipD=document.getElementById('chip-dark');
+  if(chipL) chipL.classList.toggle('active', S.theme!=='dark');
+  if(chipD) chipD.classList.toggle('active', S.theme==='dark');
+  // Update user info
+  updateUserUI();
+}
+function buildProfileColorPresets(){
+  const el = document.getElementById('prs-a');
+  if(!el) return;
+  const cols=['#10B981','#3B82F6','#8B5CF6','#F59E0B','#EF4444','#EC4899','#06B6D4','#F97316','#14b8a6','#f43f5e'];
+  el.innerHTML = cols.map(col=>`
+    <div onclick="liveAccent('${col}')"
+      title="${col}"
+      style="width:28px;height:28px;border-radius:8px;background:${col};cursor:pointer;
+             border:3px solid ${col===S.colors.a?'#fff':'transparent'};
+             box-shadow:${col===S.colors.a?'0 0 0 2px '+col:'none'};
+             flex-shrink:0;transition:border .15s,box-shadow .15s">
+    </div>`).join('');
 }
 async function doPerfilChangePass(){
   const op=document.getElementById('pf-pass0').value;
@@ -2760,7 +2779,7 @@ function startApp(){
 }
 
 function showPage(id){
-  if(id==='perfil') _initPerfilPage();
+  if(id==='profile') _initProfilePage();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id)?.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
@@ -3876,6 +3895,7 @@ function updateUserUI(){
   if(adminBtn) adminBtn.style.display = S.isAdmin ? 'flex' : 'none';
   // Profession badge in sidebar
   const sProfBadge = document.getElementById('sProfBadge');
+  const profBadgeProfile = document.getElementById('profBadgeProfile');
   if(sProfBadge && S.profession){
     const isSalud = S.profession === 'salud';
     const label = isSalud
@@ -3905,6 +3925,7 @@ function liveAccent(v){
   applyColors({a:v});
   saveData();
   if(_SB&&S.user) _SB.auth.updateUser({data:{accent:v}}).catch(()=>{});
+  if(typeof buildProfileColorPresets==="function") buildProfileColorPresets();
 }
 function applyPresetAccent(v){
   document.getElementById('cp-a').value=v; liveAccent(v);
