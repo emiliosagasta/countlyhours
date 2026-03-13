@@ -1303,79 +1303,72 @@ select option{background:var(--S);}
     <!-- PROFILE -->
     <div class="page" id="page-profile">
       <div class="ph">
-        <div><div class="ph-title" id="t-profile-title">Mi perfil</div><div class="ph-sub" id="t-profile-sub">Personalizá tu experiencia</div></div>
+        <div>
+          <div class="ph-title">👤 Mi perfil</div>
+          <div class="ph-sub">Configurá tu experiencia</div>
+        </div>
       </div>
 
-      <!-- User card -->
-      <div class="panel" style="max-width:900px">
-        <div class="prof-user-row">
-          <div class="profile-av" id="pAv">JD</div>
+      <div class="panel" style="max-width:700px">
+        <!-- Avatar + datos -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+          <div class="profile-av" id="pAv" style="width:52px;height:52px;border-radius:50%;background:var(--A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0">?</div>
           <div>
-            <div class="profile-name" id="pNm">—</div>
-            <div class="profile-email" id="pEm">—</div>
+            <div style="font-weight:700;font-size:1rem" id="pNm">—</div>
+            <div style="font-size:.82rem;color:var(--mu)" id="pEm">—</div>
+            <div id="profBadgeProfile" style="display:none;margin-top:4px;font-size:.78rem;padding:3px 10px;border-radius:20px;font-weight:600"></div>
           </div>
         </div>
-        <!-- Profession badge -->
-        <div id="profBadgeProfile" style="margin-top:8px;font-size:.8rem;padding:4px 10px;border-radius:20px;display:inline-block;font-weight:600"></div>
-        <div class="prof-divider"></div>
+        <hr style="border:none;border-top:1px solid var(--bd);margin:0 0 16px">
 
         <!-- Color -->
-        <div class="ptitle-sm" id="t-accent-title">🎨 COLOR DE LA APLICACIÓN</div>
-        <div class="prof-color-row">
-          <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:46px;height:46px;border:none;border-radius:9px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
-          <div class="cpv" id="cpv-a" style="width:46px;height:46px;border-radius:9px"></div>
-          <div class="cph" id="cph-a" style="font-size:.82rem">#10B981</div>
-          <div class="preset-grid" id="prs-a" style="flex:1;justify-content:flex-start;gap:8px"></div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🎨 COLOR DE LA APLICACIÓN</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+          <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:44px;height:44px;border:none;border-radius:9px;cursor:pointer;padding:2px;background:none;flex-shrink:0">
+          <div id="cpv-a" style="width:44px;height:44px;border-radius:9px;background:#10B981;flex-shrink:0"></div>
+          <div style="font-size:.82rem;color:var(--mu)" id="cph-a">#10B981</div>
         </div>
-        <div class="prof-divider"></div>
+        <div id="prs-a" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+        <hr style="border:none;border-top:1px solid var(--bd);margin:0 0 16px">
 
-        <!-- Appearance -->
-        <div class="ptitle-sm" id="t-theme-title">🌗 APARIENCIA</div>
-        <div class="prof-theme-row">
-          <button class="theme-big-chip active" id="chip-light" onclick="applyTheme('light')">
-            <span style="font-size:1.1rem">☀️</span> <span id="t-light">Claro</span>
-          </button>
-          <button class="theme-big-chip" id="chip-dark" onclick="applyTheme('dark')">
-            <span style="font-size:1.1rem">🌙</span> <span id="t-dark">Oscuro</span>
-          </button>
+        <!-- Tema -->
+        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌗 APARIENCIA</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <button id="chip-light" onclick="applyTheme('light')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--bd);background:var(--S2);cursor:pointer;font-weight:600;font-size:.88rem;color:var(--tx)">☀️ Claro</button>
+          <button id="chip-dark" onclick="applyTheme('dark')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--bd);background:var(--S2);cursor:pointer;font-weight:600;font-size:.88rem;color:var(--tx)">🌙 Oscuro</button>
         </div>
-        <div class="prof-divider"></div>
+        <hr style="border:none;border-top:1px solid var(--bd);margin:0 0 16px">
 
-        <!-- Language -->
-        <div class="ptitle-sm" id="t-lang-title">🌐 IDIOMA</div>
-        <div class="chip-group" style="margin-top:10px;gap:8px">
-          <button class="lang-chip active" id="lang-es" onclick="setLang('es')">🇪🇸 Español</button>
-          <button class="lang-chip" id="lang-en" onclick="setLang('en')">🇬🇧 English</button>
-          <button class="lang-chip" id="lang-ca" onclick="setLang('ca')">🟡🔴 Català</button>
-          <button class="lang-chip" id="lang-it" onclick="setLang('it')">🇮🇹 Italiano</button>
+        <!-- Idioma -->
+        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌐 IDIOMA</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+          <button id="lang-es" onclick="setLang('es')" class="lang-chip active">🇪🇸 Español</button>
+          <button id="lang-en" onclick="setLang('en')" class="lang-chip">🇬🇧 English</button>
+          <button id="lang-ca" onclick="setLang('ca')" class="lang-chip">🟡🔴 Català</button>
+          <button id="lang-it" onclick="setLang('it')" class="lang-chip">🇮🇹 Italiano</button>
         </div>
-        <div class="prof-divider"></div>
+        <hr style="border:none;border-top:1px solid var(--bd);margin:0 0 16px">
 
-        <div class="prof-divider"></div>
-
-        <!-- Cambiar contraseña -->
-        <div class="ptitle-sm">🔑 CAMBIAR CONTRASEÑA</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        <!-- Contraseña -->
+        <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🔑 CAMBIAR CONTRASEÑA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
           <div class="field">
             <label style="font-size:.72rem">Nueva contraseña</label>
             <input type="password" id="prof-new-pass" placeholder="Mín. 8 caracteres" style="font-size:.85rem">
           </div>
           <div class="field">
-            <label style="font-size:.72rem">Confirmar contraseña</label>
-            <input type="password" id="prof-conf-pass" placeholder="Repetí la contraseña" style="font-size:.85rem">
+            <label style="font-size:.72rem">Confirmar</label>
+            <input type="password" id="prof-conf-pass" placeholder="Repetila" style="font-size:.85rem">
           </div>
         </div>
-        <div id="prof-pass-msg" style="font-size:.78rem;margin-top:6px;min-height:18px"></div>
-        <button class="btn-sc" style="margin-top:8px;padding:10px 20px;font-size:.85rem" onclick="doChangePassword()">Cambiar contraseña</button>
-        <div class="prof-divider"></div>
+        <div id="prof-pass-msg" style="font-size:.78rem;margin-bottom:8px;min-height:16px"></div>
+        <button onclick="doChangePassword()" style="padding:10px 20px;border-radius:10px;border:none;background:var(--A);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem;margin-bottom:16px">Cambiar contraseña</button>
+        <hr style="border:none;border-top:1px solid var(--bd);margin:0 0 16px">
 
-        <!-- Actions -->
-        <button class="btn-sc" style="width:100%;padding:13px;font-size:.95rem;margin-bottom:10px" onclick="saveProfile()" id="t-save-btn" data-t="save-btn">Guardar</button>
-        <button class="btn-lo" onclick="doLogout()">↩ <span id="t-logout" data-t="logout">Cerrar sesión</span></button>
+        <!-- Acciones -->
+        <button onclick="doLogout()" style="width:100%;padding:13px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:.95rem;cursor:pointer">↩ <span data-t="logout">Cerrar sesión</span></button>
       </div>
     </div>
-
-
     <!-- ══ ADMIN PANEL ══ -->
     <div class="page" id="page-admin">
       <div class="ph">
@@ -1911,8 +1904,13 @@ function applyProfessionText(){
   // Placeholder es-ett (mobile shift input)
   const esEtt=document.getElementById('es-ett');
   if(esEtt) esEtt.placeholder=isSalud?'Seleccioná un paciente…':'Seleccioná una ETT…';
+  // Mobile nav ETTs label
+  const isSaludNav=S.profession==='salud';
+  const mobLabel=document.getElementById('mobNavEttsLabel');
+  const mobIcon=document.getElementById('mobNavEttsIcon');
+  if(mobLabel) mobLabel.textContent=isSaludNav?'Pacientes':'ETTs';
+  if(mobIcon) mobIcon.textContent=isSaludNav?'🧑\u200d⚕️':'🏢';
 }
-
 var _MOCK_HOST=[
   {date:'Lun 3 mar',time:'09:00→17:00',hrs:'8h',night:'0h',amt:86.40,nH:0,label:'Temporing',color:'#10B981'},
   {date:'Mié 5 mar',time:'19:00→02:00',hrs:'7h',night:'4h',amt:127.80,nH:4,label:'Adecco',color:'#8B5CF6'},
@@ -2344,36 +2342,39 @@ async function doRegister(){
   showAuthError('regError','');
   var btn=document.querySelector('#viewRegister .btn-primary');
   if(btn){btn.textContent='Registrando…';btn.disabled=true;}
-  var r=await _SB.auth.signUp({email:email,password:pass,options:{data:{
-    full_name:name+(sname?' '+sname:''),
-    profession:S.profession||'hosteleria',
-    specialty:S.specialty||''
-  }}});
-  // Also persist locally immediately
-  localStorage.setItem('tp_profession', S.profession||'hosteleria');
-  localStorage.setItem('tp_specialty', S.specialty||'');
-  if(btn){btn.textContent='Crear cuenta';btn.disabled=false;}
-  if(r.error){
-    var msg=r.error.message;
-    if(msg.includes('already registered')||msg.includes('already exists')||msg.includes('User already registered')){
-      msg='Este correo ya está registrado. ¿Querés <a onclick="showView(\'login\')" style="color:var(--A);cursor:pointer;text-decoration:underline">iniciar sesión</a>?';
-      document.getElementById('regError').innerHTML='<div style="color:#EF4444;font-size:.82rem;padding:10px 14px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">'+msg+'</div>';
-    } else {
-      showAuthError('regError',msg);
+  try{
+    var r=await _SB.auth.signUp({email:email,password:pass,options:{data:{
+      full_name:name+(sname?' '+sname:''),
+      profession:S.profession||'hosteleria',
+      specialty:S.specialty||''
+    }}});
+    localStorage.setItem('tp_profession', S.profession||'hosteleria');
+    localStorage.setItem('tp_specialty', S.specialty||'');
+    if(btn){btn.textContent='Crear cuenta';btn.disabled=false;}
+    if(r.error){
+      var msg=r.error.message||'Error al registrarse';
+      if(msg.includes('already registered')||msg.includes('already exists')||msg.includes('User already registered')){
+        msg='Este correo ya está registrado. ¿Querés <a onclick="showView(\'login\')" style="color:var(--A);cursor:pointer;text-decoration:underline">iniciar sesión</a>?';
+        document.getElementById('regError').innerHTML='<div style="color:#EF4444;font-size:.82rem;padding:10px 14px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">'+msg+'</div>';
+      } else {
+        showAuthError('regError',msg);
+      }
+      return;
     }
-    return;
+    if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){
+      var msg2='Este correo ya está registrado. ¿Querés <a onclick="showView(\'login\')" style="color:var(--A);cursor:pointer;text-decoration:underline">iniciar sesión</a>?';
+      document.getElementById('regError').innerHTML='<div style="color:#EF4444;font-size:.82rem;padding:10px 14px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">'+msg2+'</div>';
+      return;
+    }
+    var ve=document.getElementById('verifyEmail')||document.getElementById('rg-verify-email');
+    if(ve) ve.textContent=email;
+    showView('verify');
+    toast('✓ Revisá tu correo para confirmar la cuenta','#10B981');
+  } catch(err){
+    if(btn){btn.textContent='Crear cuenta';btn.disabled=false;}
+    showAuthError('regError', err.message||'Error de conexión. Intentá de nuevo.');
+    console.error('doRegister error:',err);
   }
-  // Supabase silently succeeds for existing emails when email confirm is ON
-  // Detect this: user exists but has no new identity (identities array is empty)
-  if(r.data&&r.data.user&&r.data.user.identities&&r.data.user.identities.length===0){
-    var msg2='Este correo ya está registrado. ¿Querés <a onclick="showView(\'login\')" style="color:var(--A);cursor:pointer;text-decoration:underline">iniciar sesión</a>?';
-    document.getElementById('regError').innerHTML='<div style="color:#EF4444;font-size:.82rem;padding:10px 14px;background:rgba(239,68,68,.08);border-radius:8px;border:1px solid rgba(239,68,68,.2)">'+msg2+'</div>';
-    return;
-  }
-  var ve=document.getElementById('verifyEmail')||document.getElementById('rg-verify-email');
-  if(ve)ve.textContent=email;
-  showView('verify');
-  toast('✓ Revisá tu correo para confirmar la cuenta','#10B981');
 }
 async function doVerify(){
   var code=document.getElementById('vcode').value.trim();
@@ -3925,6 +3926,7 @@ function updateUserUI(){
     sProfBadge.style.display = 'inline-block';
     sProfBadge.style.background = isSalud ? '#8B5CF6' : '#10B981';
   }
+  if(typeof applyProfessionText==="function") applyProfessionText();
 }
 /* ═══ COLORS ═══ */
 function buildPresets(){
