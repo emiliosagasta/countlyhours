@@ -2646,6 +2646,7 @@ async function doChangePassword(){
   setTimeout(()=>{if(msg)msg.textContent='';},3000);
 }
 async function doLogout(){
+  window._intentionalLogout = true;
   try{ if(_SB) await _SB.auth.signOut(); }catch(e){}
   localStorage.clear();
   sessionStorage.clear();
@@ -2692,6 +2693,10 @@ async function doResetPassword(){
 
 /* ═══ APP INIT ═══ */
 if(_SB)_SB.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='TOKEN_REFRESHED' && session && !S.user){
+    await _initUserFromSession(session);
+    return;
+  }
   if(event==='PASSWORD_RECOVERY'){
     _hideAllScreens();
     document.getElementById('authScreen').style.display='flex';
@@ -2700,6 +2705,9 @@ if(_SB)_SB.auth.onAuthStateChange(async(event,session)=>{
   }
   if(event==='SIGNED_IN'&&session&&!S.user) await _initUserFromSession(session);
   else if(event==='SIGNED_OUT'){
+    // Only act on intentional logout, not background token refresh failures
+    if(!window._intentionalLogout) return;
+    window._intentionalLogout = false;
     S.user=null;S.shifts=[];S.etts=[];
     document.getElementById('app').style.display='none';
     document.getElementById('authScreen').style.display='none';
