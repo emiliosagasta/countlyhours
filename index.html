@@ -2576,9 +2576,12 @@ async function doChangePassword(){
   setTimeout(()=>{if(msg)msg.textContent='';},3000);
 }
 async function doLogout(){
-  if(_SB) await _SB.auth.signOut();
+  try{ if(_SB) await _SB.auth.signOut(); }catch(e){}
   localStorage.clear();
-  location.reload();
+  sessionStorage.clear();
+  // Clear Supabase tokens from storage manually as fallback
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith('sb-')) localStorage.removeItem(k); });
+  location.href = location.origin + location.pathname;
 }
 
 /* ═══ PASSWORD RESET ═══ */
@@ -4017,7 +4020,18 @@ async function initOnboarding(){
   try{
     if(_SB){
       const res=await _SB.auth.getSession();
-      if(res.data&&res.data.session) await _initUserFromSession(res.data.session);
+      if(res.data&&res.data.session){
+        // Verify user still exists in Supabase (could have been deleted by admin)
+        const userCheck = await _SB.auth.getUser();
+        if(userCheck.error || !userCheck.data || !userCheck.data.user){
+          // User deleted — force clean logout
+          await _SB.auth.signOut();
+          localStorage.clear();
+          location.reload();
+          return;
+        }
+        await _initUserFromSession(res.data.session);
+      }
     }
   }catch(e){console.warn('Auth init:',e.message);}
 }
