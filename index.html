@@ -1433,25 +1433,13 @@ select option{background:var(--S);}
   </main>
 
   <!-- MOBILE NAV -->
-  <div class="mob-nav">
+  <div class="mob-nav" id="mobNav">
     <div class="mob-nav-inner">
-      <button class="mob-nav-btn active" onclick="showPage('dashboard');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📊</span><span>Dashboard</span></button>
-      <button class="mob-nav-btn" onclick="showPage('calendar');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📅</span><span>Calendario</span></button>
-      <button class="mob-nav-btn" onclick="showPage('history');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
-      <button class="mob-nav-btn" onclick="showPage('etts');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">🏢</span><span>ETTs</span></button>
-      <button class="mob-nav-btn" onclick="showPage('profile');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.toggle('active',b===this))"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
-    </div>
-  </div>
-
-
-  <!-- MOBILE BOTTOM NAV -->
-  <div class="mob-nav">
-    <div class="mob-nav-inner">
-      <button class="mob-nav-btn active" onclick="showPage('dashboard');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📊</span><span data-t="dashboard">Panel</span></button>
-      <button class="mob-nav-btn" onclick="showPage('calendar');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📅</span><span data-t="calendar">Cal.</span></button>
-      <button class="mob-nav-btn" onclick="showPage('history');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
-      <button class="mob-nav-btn" onclick="showPage('etts');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">🏢</span><span>ETTs</span></button>
-      <button class="mob-nav-btn" onclick="showPage('profile');document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
+      <button class="mob-nav-btn" id="mnBtn-dashboard" onclick="mobNavGo('dashboard')"><span class="mob-nav-icon">📊</span><span data-t="dashboard">Panel</span></button>
+      <button class="mob-nav-btn" id="mnBtn-calendar" onclick="mobNavGo('calendar')"><span class="mob-nav-icon">📅</span><span data-t="calendar">Cal.</span></button>
+      <button class="mob-nav-btn" id="mnBtn-history" onclick="mobNavGo('history')"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
+      <button class="mob-nav-btn" id="mnBtn-etts" onclick="mobNavGo('etts')"><span class="mob-nav-icon" id="mobNavEttsIcon">🏢</span><span id="mobNavEttsLabel">ETTs</span></button>
+      <button class="mob-nav-btn" id="mnBtn-profile" onclick="mobNavGo('profile')"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
     </div>
   </div>
 </div>
@@ -1747,6 +1735,10 @@ function confirmProfession(){
     var sess = window._pendingSession;
     window._pendingSession = null;
     document.getElementById('app').style.display='block';
+  // Set dashboard active in mobile nav
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  const dashBtn=document.getElementById('mnBtn-dashboard');
+  if(dashBtn) dashBtn.classList.add('active');
     _continueInitFromSession(sess);
     return;
   }
@@ -2397,27 +2389,48 @@ async function doVerify(){
 function resendCode(){ toast('Código reenviado','#6366F1'); }
 function _initPerfilPage(){ _initProfilePage(); }
 function _initProfilePage(){
-  // Sync main color picker (cp-a = the real one in page-profile)
-  const cpa = document.getElementById('cp-a');
-  if(cpa){ cpa.value = S.colors.a||'#10B981'; }
-  const cpvA = document.getElementById('cpv-a');
-  if(cpvA) cpvA.style.background = S.colors.a||'#10B981';
-  const cphA = document.getElementById('cph-a');
-  if(cphA) cphA.textContent = S.colors.a||'#10B981';
-  // Build presets
-  buildProfileColorPresets();
-  // Sync lang chips in profile page (id="lang-es" etc)
-  ['es','en','ca','it'].forEach(l=>{
-    const b=document.getElementById('lang-'+l);
-    if(b) b.classList.toggle('active', S.lang===l);
-  });
-  // Sync theme chips
-  const chipL=document.getElementById('chip-light');
-  const chipD=document.getElementById('chip-dark');
-  if(chipL) chipL.classList.toggle('active', S.theme!=='dark');
-  if(chipD) chipD.classList.toggle('active', S.theme==='dark');
-  // Update user info
-  updateUserUI();
+  try{
+    // Color picker
+    const cpa=document.getElementById('cp-a');
+    if(cpa) cpa.value=S.colors&&S.colors.a||'#10B981';
+    const cpvA=document.getElementById('cpv-a');
+    if(cpvA) cpvA.style.background=S.colors&&S.colors.a||'#10B981';
+    const cphA=document.getElementById('cph-a');
+    if(cphA) cphA.textContent=(S.colors&&S.colors.a||'#10B981').toUpperCase();
+    // Color presets
+    buildProfileColorPresets();
+    // Lang chips
+    ['es','en','ca','it'].forEach(l=>{
+      const b=document.getElementById('lang-'+l);
+      if(b) b.classList.toggle('active',S.lang===l);
+    });
+    // Theme chips
+    const cL=document.getElementById('chip-light');
+    const cD=document.getElementById('chip-dark');
+    if(cL) cL.classList.toggle('active',S.theme!=='dark');
+    if(cD) cD.classList.toggle('active',S.theme==='dark');
+    // User name/email
+    const pNm=document.getElementById('pNm');
+    const pEm=document.getElementById('pEm');
+    const pAv=document.getElementById('pAv');
+    if(pNm) pNm.textContent=S.user&&(S.user.user_metadata&&S.user.user_metadata.full_name||S.user.email)||'—';
+    if(pEm) pEm.textContent=S.user&&S.user.email||'—';
+    if(pAv&&S.user&&S.user.email) pAv.textContent=S.user.email[0].toUpperCase();
+    // Profession badge
+    const PROF_LABELS={'psicologa':'👩‍⚕️ Psicóloga','fisio':'💪 Fisioterapeuta','nutricionista':'🥗 Nutricionista','medico':'🩺 Médico/a','coach':'🧘 Coach','otro salud':'🏥 Salud','hosteleria':'🍽️ Hostelería'};
+    const badge=document.getElementById('profBadgeProfile');
+    if(badge){
+      const txt=PROF_LABELS[S.specialty]||PROF_LABELS[S.profession]||'';
+      badge.textContent=txt;
+      badge.style.display=txt?'inline-block':'none';
+      badge.style.background=S.profession==='salud'?'rgba(139,92,246,.12)':'rgba(16,185,129,.12)';
+      badge.style.color=S.profession==='salud'?'#8B5CF6':'#10B981';
+      badge.style.padding='4px 12px';
+      badge.style.borderRadius='20px';
+      badge.style.fontWeight='600';
+      badge.style.fontSize='.82rem';
+    }
+  }catch(e){ console.warn('_initProfilePage error:',e); }
 }
 function buildProfileColorPresets(){
   const el = document.getElementById('prs-a');
@@ -2778,6 +2791,12 @@ function startApp(){
   showPage('dashboard');
 }
 
+function mobNavGo(id){
+  showPage(id);
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('mnBtn-'+id);
+  if(btn) btn.classList.add('active');
+}
 function showPage(id){
   if(id==='profile') _initProfilePage();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -3895,7 +3914,6 @@ function updateUserUI(){
   if(adminBtn) adminBtn.style.display = S.isAdmin ? 'flex' : 'none';
   // Profession badge in sidebar
   const sProfBadge = document.getElementById('sProfBadge');
-  const profBadgeProfile = document.getElementById('profBadgeProfile');
   if(sProfBadge && S.profession){
     const isSalud = S.profession === 'salud';
     const label = isSalud
