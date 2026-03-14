@@ -1366,7 +1366,7 @@ select option{background:var(--S);}
       <button class="mob-nav-btn" id="mnBtn-calendar" onclick="mobNavGo('calendar')"><span class="mob-nav-icon">📅</span><span data-t="calendar">Cal.</span></button>
       <button class="mob-nav-btn" id="mnBtn-history" onclick="mobNavGo('history')"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
       <button class="mob-nav-btn" id="mnBtn-etts" onclick="mobNavGo('etts')"><span class="mob-nav-icon" id="mobNavEttsIcon">🏢</span><span id="mobNavEttsLabel">ETTs</span></button>
-      <button class="mob-nav-btn" id="mnBtn-profile" onclick="mobNavGo('profile');setTimeout(()=>{document.getElementById('perfil-section').scrollIntoView({behavior:'smooth'})},50)"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
+      <button class="mob-nav-btn" id="mnBtn-profile" onclick="openProfileModal()"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
     </div>
   </div>
 </div>
@@ -1576,6 +1576,10 @@ function openProfileModal(){
 function closeProfileModal(){
   var ov=document.getElementById('profileModalOv');
   if(ov) ov.classList.remove('open');
+  showPage('dashboard');
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  var db=document.getElementById('mnBtn-dashboard');
+  if(db) db.classList.add('active');
 }
 
 function showAuthFromLanding(view){
@@ -2079,8 +2083,8 @@ var LANGS = {
     'no-ett-selected':'Seleccioná una ETT…','no-etts':'No tenés ETTs',
     'curr-month':'Mes actual','contact':'Contacte','contact':'Contacto',
     months:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
-    days:['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
-  },
+    days:['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
+  ,'new-pass':'Nueva contraseña','confirm-pass':'Confirmar contraseña','change-pass':'Cambiar contraseña'},
   en:{
     dashboard:'Dashboard',calendar:'Calendar',history:'History',
     settings:'Settings',profile:'Profile',etts:'Agencies',
@@ -2123,7 +2127,7 @@ var LANGS = {
     'curr-month':'Current month','contact':'Contact',
     months:['January','February','March','April','May','June','July','August','September','October','November','December'],
     days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-  },
+    'new-pass':'New password','confirm-pass':'Confirm password','change-pass':'Change password'},
   ca:{
     dashboard:'Dashboard',calendar:'Calendari',history:'Historial',
     settings:'Configuració',profile:'Perfil',etts:'ETTs',
@@ -2166,7 +2170,7 @@ var LANGS = {
     'curr-month':'Mes actual','contact':'Contacte','contact':'Contacto',
     months:['Gener','Febrer','Març','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre'],
     days:['Dg','Dl','Dt','Dc','Dj','Dv','Ds'],
-  },
+    'new-pass':'Nova contrasenya','confirm-pass':'Confirmar contrasenya','change-pass':'Canviar contrasenya'},
   it:{
     dashboard:'Dashboard',calendar:'Calendario',history:'Storico',
     settings:'Impostazioni',profile:'Profilo',etts:'Agenzie',
@@ -2209,7 +2213,7 @@ var LANGS = {
     'curr-month':'Mese corrente','contact':'Contatto',
     months:['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
     days:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
-  },
+    'new-pass':'Nuova password','confirm-pass':'Conferma password','change-pass':'Cambia password'},
   zh:{
     dashboard:'仪表板',calendar:'日历',history:'历史',
     settings:'设置',profile:'个人资料',etts:'机构',
@@ -4228,7 +4232,7 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 
       <!-- Apariencia -->
       <div style="margin-bottom:20px">
-        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌗 APARIENCIA</div>
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px"><span data-t="theme-title">🌗 Apariencia</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <button id="chip-light" onclick="applyTheme('light')" class="btn-secondary">☀️ Claro</button>
           <button id="chip-dark" onclick="applyTheme('dark')" class="btn-secondary">🌙 Oscuro</button>
@@ -4237,7 +4241,7 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 
       <!-- Idioma -->
       <div style="margin-bottom:20px">
-        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌐 IDIOMA</div>
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px"><span data-t="lang-title">🌐 Idioma</span></div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           <button id="lang-es" onclick="setLang('es')" class="lang-chip">🇪🇸 Español</button>
           <button id="lang-en" onclick="setLang('en')" class="lang-chip">🇬🇧 English</button>
@@ -4248,22 +4252,22 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 
       <!-- Contraseña -->
       <div style="margin-bottom:20px">
-        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🔑 CAMBIAR CONTRASEÑA</div>
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px"><span data-t="change-pass">Cambiar contraseña</span></div>
         <div class="field" style="margin-bottom:8px">
-          <label>Nueva contraseña</label>
+          <label><span data-t="new-pass">Nueva contraseña</span></label>
           <input type="password" id="prof-new-pass" placeholder="Mínimo 8 caracteres">
         </div>
         <div class="field" style="margin-bottom:8px">
-          <label>Confirmar</label>
+          <label><span data-t="confirm-pass">Confirmar contraseña</span></label>
           <input type="password" id="prof-conf-pass" placeholder="Repetila">
         </div>
         <div id="prof-pass-msg" style="font-size:.78rem;min-height:16px;margin-bottom:8px;color:#EF4444"></div>
-        <button onclick="doChangePassword()" class="btn-primary" style="width:100%;-webkit-tap-highlight-color:rgba(0,0,0,.1)">Cambiar contraseña</button>
+        <button onclick="doChangePassword()" class="btn-primary" style="width:100%;-webkit-tap-highlight-color:rgba(0,0,0,.1)"><span data-t="change-pass">Cambiar contraseña</span></button>
       </div>
 
       <!-- Logout -->
       <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:1rem;cursor:pointer">
-        ↩ Cerrar sesión
+        ↩ <span data-t="logout">Cerrar sesión</span>
       </button>
 
     </div>
