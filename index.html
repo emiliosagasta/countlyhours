@@ -1586,6 +1586,22 @@ select option{background:var(--S);}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// Clear corrupted Supabase session data on load
+(function(){
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.includes('supabase') || k.includes('sb-'));
+    keys.forEach(k => {
+      try {
+        const v = localStorage.getItem(k);
+        if(v) JSON.parse(v); // test if valid JSON
+      } catch(e) {
+        localStorage.removeItem(k);
+        console.log('Removed corrupted key:', k);
+      }
+    });
+  } catch(e) {}
+})();
+
 const _SB=(()=>{try{
   if(!window.supabase) return null;
   // Custom lock to prevent multi-tab deadlock on mobile browsers
@@ -1998,6 +2014,7 @@ function _updMock(total,nH,count){
 
 /* ═══ AUTH HELPERS ═══ */
 async function _initUserFromSession(session){
+  if(!session){return;}
   localStorage.setItem('tp_hasLoggedIn','1');
   _hideAllScreens();
   document.getElementById('app').style.display='block';
