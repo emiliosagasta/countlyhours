@@ -4267,6 +4267,17 @@ function openTnc(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
+function openProfileModal(){
+  const ov=document.getElementById('profileModalOv');
+  if(!ov) return;
+  try{_initProfilePage();}catch(e){console.warn(e);}
+  ov.classList.add('open');
+}
+function closeProfileModal(){
+  const ov=document.getElementById('profileModalOv');
+  if(ov) ov.classList.remove('open');
+}
+
 </script>
 
 <!-- QUICK SETTINGS POPUP -->
