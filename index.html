@@ -408,7 +408,7 @@ select option{background:var(--S);}
 @media(max-width:768px){
   .sidebar{display:none;}
   .mob-nav{display:block;}
-  .main{margin-left:0;padding:16px 14px 72px;}
+  .main{margin-left:0;padding:16px 14px 72px;min-height:100vh;}
   .stat-grid{grid-template-columns:repeat(2,1fr);gap:9px;}
   .form-grid{grid-template-columns:1fr 1fr;}
   .span4{grid-column:span 2;}
@@ -2815,12 +2815,15 @@ function showPage(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   if(id==='profile'){
     const pp=document.getElementById('page-profile');
-    console.log('PROFILE: pp=',pp,'display=',pp?getComputedStyle(pp).display:'N/A');
     if(pp){
       pp.className='page active';
       pp.removeAttribute('style');
-      pp.style.cssText='display:block!important;visibility:visible!important;opacity:1!important;position:static!important;padding-bottom:80px;';
-      console.log('PROFILE: after force, display=',getComputedStyle(pp).display,'visibility=',getComputedStyle(pp).visibility);
+      pp.style.cssText='display:block!important;visibility:visible!important;opacity:1!important;position:static!important;padding-bottom:80px;min-height:200px;';
+      // Force reflow on iOS Safari
+      void pp.offsetHeight;
+      const mn=document.querySelector('.main');
+      if(mn){mn.style.overflow='hidden';void mn.offsetHeight;mn.style.overflow='';}
+      window.scrollTo(0,0);
     }
     try{_initProfilePage();}catch(e){console.warn('profile init:',e);}
   }
