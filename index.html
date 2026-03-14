@@ -2896,12 +2896,24 @@ function mobNavGo(id){
   if(btn) btn.classList.add('active');
 }
 function showPage(id){
+  if(id==='profile'){
+    // Perfil está dentro del dashboard - solo activar dashboard y hacer scroll
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const dash=document.getElementById('page-dashboard');
+    if(dash) dash.classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page==='profile'));
+    setTimeout(()=>{
+      const s=document.getElementById('perfil-section');
+      if(s) s.scrollIntoView({behavior:'smooth',block:'start'});
+    },50);
+    try{_initProfilePage();}catch(e){console.warn(e);}
+    return;
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+id);
   if(pg) pg.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
   window.scrollTo(0,0);
-  try{ if(id==='profile')  _initProfilePage(); }catch(e){console.warn(e);}
   try{ if(id==='admin')    adminLoadData(); }catch(e){}
   try{ if(id==='calendar') renderCalendar(); }catch(e){}
   try{ if(id==='history')  renderHistory(); }catch(e){}
