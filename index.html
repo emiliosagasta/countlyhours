@@ -1150,6 +1150,65 @@ select option{background:var(--S);}
       </div>
     </div>
 
+      <!-- PERFIL SECTION - siempre visible al final del dashboard -->
+      <div id="perfil-section" style="margin-top:24px;padding-top:8px;border-top:2px solid var(--bd)">
+        <div class="ph-title" style="margin-bottom:16px">👤 Mi perfil</div>
+
+        <div class="panel" style="margin-bottom:12px">
+          <div style="font-weight:700;font-size:1rem" id="pNm">—</div>
+          <div style="font-size:.85rem;color:var(--mu)" id="pEm">—</div>
+          <div id="profBadgeProfile" style="display:none;margin-top:6px;font-size:.82rem;padding:4px 12px;border-radius:20px;font-weight:600"></div>
+        </div>
+
+        <div class="panel" style="margin-bottom:12px">
+          <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🎨 COLOR</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:44px;height:44px;border:none;border-radius:8px;cursor:pointer;padding:0">
+            <div id="cpv-a" style="width:44px;height:44px;border-radius:8px;background:#10B981;border:1px solid var(--bd)"></div>
+            <span style="font-family:monospace;font-size:.85rem;color:var(--mu)" id="cph-a">#10B981</span>
+          </div>
+          <div id="prs-a" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+
+        <div class="panel" style="margin-bottom:12px">
+          <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌗 APARIENCIA</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button id="chip-light" onclick="applyTheme('light')" class="btn-secondary">☀️ Claro</button>
+            <button id="chip-dark" onclick="applyTheme('dark')" class="btn-secondary">🌙 Oscuro</button>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:12px">
+          <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌐 IDIOMA</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button id="lang-es" onclick="setLang('es')" class="lang-chip">🇪🇸 Español</button>
+            <button id="lang-en" onclick="setLang('en')" class="lang-chip">🇬🇧 English</button>
+            <button id="lang-ca" onclick="setLang('ca')" class="lang-chip">🟡🔴 Català</button>
+            <button id="lang-it" onclick="setLang('it')" class="lang-chip">🇮🇹 Italiano</button>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:12px">
+          <div style="font-size:.72rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🔑 CAMBIAR CONTRASEÑA</div>
+          <div class="field" style="margin-bottom:8px">
+            <label>Nueva contraseña</label>
+            <input type="password" id="prof-new-pass" placeholder="Mínimo 8 caracteres">
+          </div>
+          <div class="field" style="margin-bottom:8px">
+            <label>Confirmar</label>
+            <input type="password" id="prof-conf-pass" placeholder="Repetila">
+          </div>
+          <div id="prof-pass-msg" style="font-size:.78rem;min-height:16px;margin-bottom:8px;color:#EF4444"></div>
+          <button onclick="doChangePassword()" class="btn-primary">Cambiar contraseña</button>
+        </div>
+
+        <div class="panel">
+          <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:1rem;cursor:pointer">
+            ↩ <span data-t="logout">Cerrar sesión</span>
+          </button>
+        </div>
+      </div>
+
     <!-- CALENDAR -->
     <div class="page" id="page-calendar">
       <div class="ph">
@@ -1430,7 +1489,7 @@ select option{background:var(--S);}
       <button class="mob-nav-btn" id="mnBtn-calendar" onclick="mobNavGo('calendar')"><span class="mob-nav-icon">📅</span><span data-t="calendar">Cal.</span></button>
       <button class="mob-nav-btn" id="mnBtn-history" onclick="mobNavGo('history')"><span class="mob-nav-icon">📆</span><span data-t="history">Historial</span></button>
       <button class="mob-nav-btn" id="mnBtn-etts" onclick="mobNavGo('etts')"><span class="mob-nav-icon" id="mobNavEttsIcon">🏢</span><span id="mobNavEttsLabel">ETTs</span></button>
-      <button class="mob-nav-btn" id="mnBtn-profile" onclick="mobNavGo('profile')"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
+      <button class="mob-nav-btn" id="mnBtn-profile" onclick="mobNavGo('profile');setTimeout(()=>{document.getElementById('perfil-section').scrollIntoView({behavior:'smooth'})},50)"><span class="mob-nav-icon">👤</span><span data-t="profile">Perfil</span></button>
     </div>
   </div>
 </div>
