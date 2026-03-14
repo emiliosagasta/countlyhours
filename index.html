@@ -4248,71 +4248,77 @@ window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
 </div>
 
 <!-- PERFIL MODAL -->
-<div class="modal-ov" id="profileModalOv" onclick="if(event.target===this)closeProfileModal()" style="align-items:flex-end;padding:0">
-  <div style="background:var(--S);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 20px 40px">
+<div class="modal-ov" id="profileModalOv" style="align-items:flex-end;padding:0">
+  <div id="profileModalInner" style="background:var(--S);border-radius:20px 20px 0 0;width:100%;max-height:88vh;display:flex;flex-direction:column">
     
-    <div style="width:40px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 20px"></div>
-
-    <!-- Cuenta -->
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-      <div id="pAv" style="width:48px;height:48px;border-radius:50%;background:var(--A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0">?</div>
-      <div>
-        <div style="font-weight:700;font-size:1rem" id="pNm">—</div>
-        <div style="font-size:.82rem;color:var(--mu)" id="pEm">—</div>
+    <!-- Header fijo -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--bd);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="pAv" style="width:40px;height:40px;border-radius:50%;background:var(--A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;flex-shrink:0">?</div>
+        <div>
+          <div style="font-weight:700;font-size:.95rem;line-height:1.2" id="pNm">—</div>
+          <div style="font-size:.78rem;color:var(--mu)" id="pEm">—</div>
+          <div id="profBadgeProfile" style="display:none;font-size:.72rem;padding:2px 8px;border-radius:20px;font-weight:600;margin-top:2px"></div>
+        </div>
       </div>
+      <button onclick="closeProfileModal()" style="width:32px;height:32px;border-radius:50%;border:none;background:var(--S2);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
     </div>
 
-    <!-- Color -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:.7rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🎨 COLOR</div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:44px;height:44px;border:none;border-radius:8px;cursor:pointer;padding:0">
-        <div id="cpv-a" style="width:44px;height:44px;border-radius:8px;background:#10B981;border:1px solid var(--bd)"></div>
-        <span style="font-family:monospace;font-size:.85rem;color:var(--mu)" id="cph-a">#10B981</span>
+    <!-- Contenido scrolleable -->
+    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px 40px;flex:1">
+
+      <!-- Color -->
+      <div style="margin-bottom:20px">
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🎨 COLOR DE LA APP</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <input type="color" id="cp-a" value="#10B981" oninput="liveAccent(this.value)" style="width:44px;height:44px;border:none;border-radius:8px;cursor:pointer;padding:0;flex-shrink:0">
+          <div id="cpv-a" style="width:44px;height:44px;border-radius:8px;background:#10B981;border:1px solid var(--bd);flex-shrink:0"></div>
+          <span style="font-family:monospace;font-size:.82rem;color:var(--mu)" id="cph-a">#10B981</span>
+        </div>
+        <div id="prs-a" style="display:flex;flex-wrap:wrap;gap:8px"></div>
       </div>
-      <div id="prs-a" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+
+      <!-- Apariencia -->
+      <div style="margin-bottom:20px">
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌗 APARIENCIA</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button id="chip-light" onclick="applyTheme('light')" class="btn-secondary">☀️ Claro</button>
+          <button id="chip-dark" onclick="applyTheme('dark')" class="btn-secondary">🌙 Oscuro</button>
+        </div>
+      </div>
+
+      <!-- Idioma -->
+      <div style="margin-bottom:20px">
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌐 IDIOMA</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button id="lang-es" onclick="setLang('es')" class="lang-chip">🇪🇸 Español</button>
+          <button id="lang-en" onclick="setLang('en')" class="lang-chip">🇬🇧 English</button>
+          <button id="lang-ca" onclick="setLang('ca')" class="lang-chip">🟡🔴 Català</button>
+          <button id="lang-it" onclick="setLang('it')" class="lang-chip">🇮🇹 Italiano</button>
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div style="margin-bottom:20px">
+        <div style="font-size:.68rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🔑 CAMBIAR CONTRASEÑA</div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Nueva contraseña</label>
+          <input type="password" id="prof-new-pass" placeholder="Mínimo 8 caracteres">
+        </div>
+        <div class="field" style="margin-bottom:8px">
+          <label>Confirmar</label>
+          <input type="password" id="prof-conf-pass" placeholder="Repetila">
+        </div>
+        <div id="prof-pass-msg" style="font-size:.78rem;min-height:16px;margin-bottom:8px;color:#EF4444"></div>
+        <button onclick="doChangePassword()" class="btn-primary" style="width:100%">Cambiar contraseña</button>
+      </div>
+
+      <!-- Logout -->
+      <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:1rem;cursor:pointer">
+        ↩ Cerrar sesión
+      </button>
+
     </div>
-
-    <!-- Apariencia -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:.7rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌗 APARIENCIA</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button id="chip-light" onclick="applyTheme('light')" class="btn-secondary">☀️ Claro</button>
-        <button id="chip-dark" onclick="applyTheme('dark')" class="btn-secondary">🌙 Oscuro</button>
-      </div>
-    </div>
-
-    <!-- Idioma -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:.7rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🌐 IDIOMA</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px">
-        <button id="lang-es" onclick="setLang('es')" class="lang-chip">🇪🇸 Español</button>
-        <button id="lang-en" onclick="setLang('en')" class="lang-chip">🇬🇧 English</button>
-        <button id="lang-ca" onclick="setLang('ca')" class="lang-chip">🟡🔴 Català</button>
-        <button id="lang-it" onclick="setLang('it')" class="lang-chip">🇮🇹 Italiano</button>
-      </div>
-    </div>
-
-    <!-- Contraseña -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:.7rem;font-weight:700;color:var(--mu);letter-spacing:.8px;margin-bottom:10px">🔑 CAMBIAR CONTRASEÑA</div>
-      <div class="field" style="margin-bottom:8px">
-        <label>Nueva contraseña</label>
-        <input type="password" id="prof-new-pass" placeholder="Mínimo 8 caracteres">
-      </div>
-      <div class="field" style="margin-bottom:8px">
-        <label>Confirmar</label>
-        <input type="password" id="prof-conf-pass" placeholder="Repetila">
-      </div>
-      <div id="prof-pass-msg" style="font-size:.78rem;min-height:16px;margin-bottom:8px;color:#EF4444"></div>
-      <button onclick="doChangePassword()" class="btn-primary">Cambiar contraseña</button>
-    </div>
-
-    <!-- Logout -->
-    <button onclick="doLogout()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#EF4444;color:#fff;font-weight:700;font-size:1rem;cursor:pointer">
-      ↩ <span data-t="logout">Cerrar sesión</span>
-    </button>
-
   </div>
 </div>
 </body>
