@@ -1628,6 +1628,17 @@ const _SB=(()=>{try{
 
 
 /* ═══ LANDING ═══ */
+function openProfileModal(){
+  var ov=document.getElementById('profileModalOv');
+  if(!ov){alert('Modal no encontrado');return;}
+  try{_initProfilePage();}catch(e){console.warn(e);}
+  ov.classList.add('open');
+}
+function closeProfileModal(){
+  var ov=document.getElementById('profileModalOv');
+  if(ov) ov.classList.remove('open');
+}
+
 function showAuthFromLanding(view){
   document.getElementById('landingScreen').style.display='none';
   document.body.style.background='#080b12';
@@ -2779,9 +2790,9 @@ async function checkLogin(){
 }
 
 function _hideAllScreens(){
-  document.getElementById('landingScreen').style.display='none';
-  document.getElementById('authScreen').style.display='none';
-  document.getElementById('onboarding').style.display='none';
+  var ls=document.getElementById('landingScreen'); if(ls) ls.style.display='none';
+  var as=document.getElementById('authScreen'); if(as) as.style.display='none';
+  var ob=document.getElementById('onboarding'); if(ob) ob.style.display='none';
   document.body.style.background='';
   document.body.style.removeProperty('background');
 }
@@ -4267,17 +4278,6 @@ function openTnc(){
 }
 
 window.addEventListener('DOMContentLoaded', function(){ initOnboarding(); });
-function openProfileModal(){
-  const ov=document.getElementById('profileModalOv');
-  if(!ov) return;
-  try{_initProfilePage();}catch(e){console.warn(e);}
-  ov.classList.add('open');
-}
-function closeProfileModal(){
-  const ov=document.getElementById('profileModalOv');
-  if(ov) ov.classList.remove('open');
-}
-
 </script>
 
 <!-- QUICK SETTINGS POPUP -->
